@@ -7,12 +7,6 @@ import { submitCheckin } from "@/lib/checkin";
 
 type FieldErrors = Partial<Record<"name" | "phone", string>>;
 const normalizePhone = (value: string) => value.replace(/[^0-9]/g, "").slice(0, 11);
-const formatPhone = (value: string) => {
-  const numbers = normalizePhone(value);
-  if (numbers.length <= 3) return numbers;
-  if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-  return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
-};
 
 function validate(name: string, phone: string): FieldErrors {
   const errors: FieldErrors = {};
@@ -85,7 +79,7 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
         <TextField
           name="name"
           label="이름"
-          placeholder="이름을 입력해주세요"
+          placeholder="김젝트"
           value={name}
           onChange={(event) => {
             setName(event.target.value);
@@ -101,26 +95,23 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
           name="phone"
           type="tel"
           inputMode="numeric"
-          label="연락처"
-          placeholder="010-0000-0000"
+          label="휴대폰 번호"
+          placeholder="01012345678"
           value={phone}
           onChange={(event) => {
-            setPhone(formatPhone(event.target.value));
+            setPhone(normalizePhone(event.target.value));
             if (errors.phone) setErrors((current) => ({ ...current, phone: undefined }));
           }}
           validation={errors.phone ? "error" : "none"}
-          helperText={errors.phone ?? "체크인 확인에만 사용됩니다."}
+          helperText={errors.phone}
           autoComplete="tel"
           disabled={isPending}
           required
         />
       </div>
-      <BlockButton.Basic type="submit" size="lg" hierarchy="accent" disabled={isPending}>
-        {isPending ? "체크인 중..." : "체크인하기"}
+      <BlockButton.Basic type="submit" size="md" hierarchy="primary" disabled={isPending}>
+        {isPending ? "제출 중..." : "제출하기"}
       </BlockButton.Basic>
-      <p className="checkin-form__privacy semantic-textStyle-body-2xs-normal">
-        입력한 정보는 행사 출석 확인 후 안전하게 파기됩니다.
-      </p>
     </form>
   );
 }

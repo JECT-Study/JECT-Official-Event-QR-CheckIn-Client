@@ -1,11 +1,12 @@
 "use client";
 
+import { Icon } from "@jects/jds";
 import { CheckinFooter } from "./checkin-footer";
 import { CheckinForm } from "./checkin-form";
 import { CheckinHeader } from "./checkin-header";
 import { Providers } from "./providers";
 
-const EVENT = { title: "젝트 오프라인 행사명을 입력합니다", dateTime: "YYYY년 M월 D일(aaa) HH:mm" };
+const EVENT = { title: "젝트 5기 온보딩 체크인", dateTime: "2026년 9월 19일(토) 13:00" };
 
 export default function CheckinApp() {
   return (
@@ -17,11 +18,11 @@ export default function CheckinApp() {
             <header className="event-summary">
               <h1 id="event-title" className="semantic-textStyle-title-4">{EVENT.title}</h1>
               <p className="event-date semantic-textStyle-body-xs-normal">
-                <span className="calendar-icon" aria-hidden="true" />
+                <Icon name="calendar-line" size="2xs" aria-hidden="true" />
                 <time>{EVENT.dateTime}</time>
               </p>
               <p className="event-description semantic-textStyle-body-sm-normal">
-                출석 확인을 위해 이름과 연락처를 입력해주세요.
+                구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.
               </p>
             </header>
             <CheckinForm eventTitle={EVENT.title} />
