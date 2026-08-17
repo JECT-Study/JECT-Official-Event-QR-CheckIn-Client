@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Check-in API contract
+
+QR links use `/checkin/{eventSlug}`. On page render, the server requests
+`GET {CHECKIN_API_BASE_URL}/events/{eventSlug}` and expects:
+
+```json
+{
+  "id": "event-id",
+  "title": "Event title",
+  "dateTime": "2026년 9월 19일(토) 13:00",
+  "description": "Optional form description",
+  "submissionEndpoint": "/events/event-id/check-ins"
+}
+```
+
+On submit, the client sends `POST` to `submissionEndpoint` with:
+
+```json
+{
+  "eventId": "event-id",
+  "name": "김젝트",
+  "phone": "01012345678"
+}
+```
+
+When `CHECKIN_API_BASE_URL` is empty, local mock event and submission responses are used.

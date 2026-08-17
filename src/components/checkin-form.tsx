@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { BlockButton, Icon, TextField, useToast } from "@jects/jds";
 import { useRouter } from "next/navigation";
 import { submitCheckin } from "@/lib/checkin";
+import type { CheckinEvent } from "@/lib/event";
 
 type FieldErrors = Partial<Record<"name" | "phone", string>>;
 const normalizePhone = (value: string) => value.replace(/[^0-9]/g, "").slice(0, 11);
@@ -20,7 +21,7 @@ function validate(name: string, phone: string): FieldErrors {
   return errors;
 }
 
-export function CheckinForm({ eventTitle }: { eventTitle: string }) {
+export function CheckinForm({ event }: { event: CheckinEvent }) {
   const { toast } = useToast();
   const router = useRouter();
   const [name, setName] = useState("");
@@ -29,8 +30,8 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
   const [isPending, setIsPending] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
+    formEvent.preventDefault();
     if (isPending) return;
     const nextErrors = validate(name, phone);
     setErrors(nextErrors);
@@ -41,7 +42,10 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
 
     setIsPending(true);
     try {
-      const result = await submitCheckin({ name: name.trim(), phone: normalizePhone(phone) });
+      const result = await submitCheckin(event.id, event.submissionEndpoint, {
+        name: name.trim(),
+        phone: normalizePhone(phone),
+      });
       if (result.status === "success") {
         setIsComplete(true);
         toast.positive("체크인이 완료되었습니다.");
@@ -66,7 +70,7 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
         <div>
           <h2 id="completion-title" className="semantic-textStyle-title-6">체크인이 완료되었습니다</h2>
           <p className="semantic-textStyle-body-sm-normal">
-            {name}님, {eventTitle} 출석이 확인되었습니다.
+            {name}님, {event.title} 출석이 확인되었습니다.
           </p>
         </div>
       </section>

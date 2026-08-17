@@ -5,16 +5,18 @@ export type CheckinResult =
   | { status: "invalid-event" }
   | { status: "error" };
 
-const delay = (milliseconds: number) =>
-  new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+const delay = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export async function submitCheckin(input: CheckinInput): Promise<CheckinResult> {
-  const endpoint = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (endpoint) {
-    const response = await fetch(`${endpoint}/check-ins`, {
+export async function submitCheckin(
+  eventId: string,
+  submissionEndpoint: string,
+  input: CheckinInput,
+): Promise<CheckinResult> {
+  if (!submissionEndpoint.startsWith("mock://")) {
+    const response = await fetch(submissionEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
+      body: JSON.stringify({ eventId, ...input }),
     });
     if (response.status === 409) return { status: "duplicate" };
     if (response.status === 404 || response.status === 410) return { status: "invalid-event" };

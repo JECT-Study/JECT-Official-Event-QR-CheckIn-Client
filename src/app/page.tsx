@@ -1,5 +1,5 @@
-import { ClientOnlyCheckin } from "@/components/client-only-checkin";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <ClientOnlyCheckin />;
+  redirect("/checkin/ject-5th-onboarding");
 }
