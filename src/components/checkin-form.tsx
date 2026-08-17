@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { BlockButton, Icon, TextField, useToast } from "@jects/jds";
+import { useRouter } from "next/navigation";
 import { submitCheckin } from "@/lib/checkin";
 
 type FieldErrors = Partial<Record<"name" | "phone", string>>;
@@ -27,6 +28,7 @@ function validate(name: string, phone: string): FieldErrors {
 
 export function CheckinForm({ eventTitle }: { eventTitle: string }) {
   const { toast } = useToast();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -52,12 +54,12 @@ export function CheckinForm({ eventTitle }: { eventTitle: string }) {
       } else if (result.status === "duplicate") {
         toast.basic("이미 체크인이 완료된 정보입니다.");
       } else if (result.status === "invalid-event") {
-        toast.destructive("유효하지 않거나 종료된 행사입니다.");
+        router.push("/error/invalid-access");
       } else {
-        toast.destructive("잠시 후 다시 시도해주세요.");
+        router.push("/error/checkin-failed");
       }
     } catch {
-      toast.destructive("네트워크 연결을 확인해주세요.");
+      router.push("/error/checkin-failed");
     } finally {
       setIsPending(false);
     }

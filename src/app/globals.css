@@ -74,6 +74,43 @@ a { color: inherit; }
 .checkin-footer__copyright { margin: 12px 0 0; font-size: 10px; line-height: 14px; }
 .checkin-footer__copyright + .checkin-footer__copyright { margin-top: 2px; }
 
+.error-main {
+  display: flex;
+  width: 100%;
+  min-height: 320px;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-page {
+  display: flex;
+  width: 100%;
+  padding: 48px 20px 56px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.error-page__symbol {
+  display: block;
+  width: 120px;
+  height: 104px;
+}
+
+.error-page__copy {
+  margin-top: 28px;
+}
+
+.error-page__copy h1,
+.error-page__copy p {
+  margin: 0;
+}
+
+.error-page__copy p {
+  margin-top: 8px;
+  color: var(--object-subtle);
+}
+
 @media (min-width: 768px) {
   .checkin-header__inner { height: 56px; padding-inline: 24px; }
   .checkin-content { padding-top: 72px; }
