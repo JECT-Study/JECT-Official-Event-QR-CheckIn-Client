@@ -15,14 +15,23 @@
 html, body { min-height: 100%; }
 body {
   margin: 0;
-  background: var(--page-background);
+  background: #f5f5f5;
   color: var(--object-boldest);
   font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 button, input { font: inherit; }
 a { color: inherit; }
 
-.site-shell { display: flex; min-height: 100dvh; flex-direction: column; }
+.site-shell {
+  display: flex;
+  width: 100%;
+  min-width: 375px;
+  max-width: 520px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  flex-direction: column;
+  background: var(--page-background);
+}
 .checkin-loading { display: grid; min-height: 100dvh; place-items: center; color: var(--object-subtle); font-size: 14px; }
 .checkin-header { width: 100%; border-bottom: 1px solid var(--stroke-subtle); background: rgb(255 255 255 / 96%); }
 .checkin-header__inner {
@@ -31,7 +40,7 @@ a { color: inherit; }
 }
 .checkin-header__label { padding-left: 10px; border-left: 1px solid var(--stroke-subtle); }
 .checkin-main { display: flex; width: 100%; flex: 1; justify-content: center; }
-.checkin-content { width: 100%; max-width: 400px; padding: 52px 20px 96px; }
+.checkin-content { width: 100%; max-width: 520px; padding: 52px 20px 96px; }
 .event-summary h1 { margin: 0; color: var(--object-boldest); word-break: keep-all; }
 .event-date { display: flex; margin: 12px 0 0; align-items: center; gap: 6px; color: var(--object-normal); }
 .calendar-icon { width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; }
