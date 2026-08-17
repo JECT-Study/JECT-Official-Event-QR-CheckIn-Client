@@ -1,0 +1,124 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { BlockButton, Icon, TextField, useToast } from "@jects/jds";
+import { submitCheckin } from "@/lib/checkin";
+
+type FieldErrors = Partial<Record<"name" | "phone", string>>;
+const normalizePhone = (value: string) => value.replace(/[^0-9]/g, "").slice(0, 11);
+const formatPhone = (value: string) => {
+  const numbers = normalizePhone(value);
+  if (numbers.length <= 3) return numbers;
+  if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+  return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+};
+
+function validate(name: string, phone: string): FieldErrors {
+  const errors: FieldErrors = {};
+  if (!name.trim()) errors.name = "이름을 입력해주세요.";
+  else if (name.trim().length < 2) errors.name = "이름을 두 글자 이상 입력해주세요.";
+  const phoneNumbers = normalizePhone(phone);
+  if (!phoneNumbers) errors.phone = "연락처를 입력해주세요.";
+  else if (!/^01[016789]\d{7,8}$/.test(phoneNumbers)) {
+    errors.phone = "올바른 휴대전화 번호를 입력해주세요.";
+  }
+  return errors;
+}
+
+export function CheckinForm({ eventTitle }: { eventTitle: string }) {
+  const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [isPending, setIsPending] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isPending) return;
+    const nextErrors = validate(name, phone);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      toast.destructive("입력 내용을 다시 확인해주세요.");
+      return;
+    }
+
+    setIsPending(true);
+    try {
+      const result = await submitCheckin({ name: name.trim(), phone: normalizePhone(phone) });
+      if (result.status === "success") {
+        setIsComplete(true);
+        toast.positive("체크인이 완료되었습니다.");
+      } else if (result.status === "duplicate") {
+        toast.basic("이미 체크인이 완료된 정보입니다.");
+      } else if (result.status === "invalid-event") {
+        toast.destructive("유효하지 않거나 종료된 행사입니다.");
+      } else {
+        toast.destructive("잠시 후 다시 시도해주세요.");
+      }
+    } catch {
+      toast.destructive("네트워크 연결을 확인해주세요.");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  if (isComplete) {
+    return (
+      <section className="completion" aria-labelledby="completion-title" aria-live="polite">
+        <span className="completion__icon" aria-hidden="true"><Icon name="check-line" size="xl" /></span>
+        <div>
+          <h2 id="completion-title" className="semantic-textStyle-title-6">체크인이 완료되었습니다</h2>
+          <p className="semantic-textStyle-body-sm-normal">
+            {name}님, {eventTitle} 출석이 확인되었습니다.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <form className="checkin-form" onSubmit={handleSubmit} noValidate>
+      <div className="checkin-form__fields">
+        <TextField
+          name="name"
+          label="이름"
+          placeholder="이름을 입력해주세요"
+          value={name}
+          onChange={(event) => {
+            setName(event.target.value);
+            if (errors.name) setErrors((current) => ({ ...current, name: undefined }));
+          }}
+          validation={errors.name ? "error" : "none"}
+          helperText={errors.name}
+          autoComplete="name"
+          disabled={isPending}
+          required
+        />
+        <TextField
+          name="phone"
+          type="tel"
+          inputMode="numeric"
+          label="연락처"
+          placeholder="010-0000-0000"
+          value={phone}
+          onChange={(event) => {
+            setPhone(formatPhone(event.target.value));
+            if (errors.phone) setErrors((current) => ({ ...current, phone: undefined }));
+          }}
+          validation={errors.phone ? "error" : "none"}
+          helperText={errors.phone ?? "체크인 확인에만 사용됩니다."}
+          autoComplete="tel"
+          disabled={isPending}
+          required
+        />
+      </div>
+      <BlockButton.Basic type="submit" size="lg" hierarchy="accent" disabled={isPending}>
+        {isPending ? "체크인 중..." : "체크인하기"}
+      </BlockButton.Basic>
+      <p className="checkin-form__privacy semantic-textStyle-body-2xs-normal">
+        입력한 정보는 행사 출석 확인 후 안전하게 파기됩니다.
+      </p>
+    </form>
+  );
+}

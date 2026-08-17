@@ -1,26 +1,74 @@
 @import "tailwindcss";
+@import "../../node_modules/@jects/jds/dist/theme.css";
+@import "../../node_modules/@jects/jds/dist/index.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --page-background: #ffffff;
+  --object-boldest: #1b1c21;
+  --object-normal: #58595c;
+  --object-subtle: #767679;
+  --stroke-subtle: #e0e0e1;
+  --feedback-positive: #2f8f46;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--page-background);
+  color: var(--object-boldest);
+  font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+button, input { font: inherit; }
+a { color: inherit; }
+
+.site-shell { display: flex; min-height: 100dvh; flex-direction: column; }
+.checkin-loading { display: grid; min-height: 100dvh; place-items: center; color: var(--object-subtle); font-size: 14px; }
+.checkin-header { width: 100%; border-bottom: 1px solid var(--stroke-subtle); background: rgb(255 255 255 / 96%); }
+.checkin-header__inner {
+  display: flex; width: min(100%, 922px); height: 52px; margin: 0 auto; padding: 0 20px;
+  align-items: center; gap: 10px;
+}
+.checkin-header__label { padding-left: 10px; border-left: 1px solid var(--stroke-subtle); }
+.checkin-main { display: flex; width: 100%; flex: 1; justify-content: center; }
+.checkin-content { width: 100%; max-width: 400px; padding: 52px 20px 96px; }
+.event-summary h1 { margin: 0; color: var(--object-boldest); word-break: keep-all; }
+.event-date { display: flex; margin: 12px 0 0; align-items: center; gap: 6px; color: var(--object-normal); }
+.calendar-icon { width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; }
+.calendar-icon::before { content: ""; position: absolute; top: 3px; left: 0; width: 100%; border-top: 1.5px solid currentColor; }
+.event-description { margin: 28px 0 0; color: var(--object-subtle); word-break: keep-all; }
+.checkin-form { display: flex; margin-top: 48px; flex-direction: column; gap: 16px; }
+.checkin-form__fields { display: flex; flex-direction: column; gap: 24px; margin-bottom: 16px; }
+.checkin-form > button { width: 100%; }
+.checkin-form__privacy { margin: 0; color: var(--object-subtle); text-align: center; word-break: keep-all; }
+.completion {
+  display: flex; margin-top: 48px; padding: 24px; border: 1px solid #b8dfc0; border-radius: 12px;
+  background: #f2faf3; align-items: flex-start; gap: 16px;
+}
+.completion__icon {
+  display: inline-flex; width: 40px; height: 40px; flex: 0 0 40px; align-items: center;
+  justify-content: center; border-radius: 50%; background: var(--feedback-positive); color: #fff;
+}
+.completion h2, .completion p { margin: 0; }
+.completion p { margin-top: 8px; color: var(--object-normal); word-break: keep-all; }
+.checkin-footer { width: 100%; padding: 24px 20px 32px; border-top: 1px solid var(--stroke-subtle); color: var(--object-subtle); }
+.checkin-footer__links { display: flex; margin: 0; padding: 0; flex-wrap: wrap; gap: 10px 16px; list-style: none; }
+.checkin-footer__links a { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; line-height: 16px; text-decoration: none; }
+.checkin-footer__links a:hover { text-decoration: underline; }
+.checkin-footer__copyright { margin: 12px 0 0; font-size: 10px; line-height: 14px; }
+.checkin-footer__copyright + .checkin-footer__copyright { margin-top: 2px; }
+
+@media (min-width: 768px) {
+  .checkin-header__inner { height: 56px; padding-inline: 24px; }
+  .checkin-content { padding-top: 72px; }
+  .checkin-footer { padding-inline: max(24px, calc((100% - 922px) / 2)); }
+}
+@media (max-width: 359px) {
+  .checkin-content, .checkin-header__inner, .checkin-footer { padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important; transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+  }
 }
