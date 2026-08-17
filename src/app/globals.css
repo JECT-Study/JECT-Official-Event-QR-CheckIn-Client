@@ -39,7 +39,7 @@ a { color: inherit; }
   align-items: center; gap: 10px;
 }
 .checkin-header__label { padding-left: 10px; border-left: 1px solid var(--stroke-subtle); }
-.checkin-main { display: flex; width: 100%; flex: 1; justify-content: center; }
+.checkin-main { display: flex; width: 100%; justify-content: center; }
 .checkin-content { width: 100%; max-width: 520px; padding: 52px 20px 96px; }
 .event-summary h1 { margin: 0; color: var(--object-boldest); word-break: keep-all; }
 .event-date { display: flex; margin: 12px 0 0; align-items: center; gap: 6px; color: var(--object-normal); }
@@ -60,7 +60,14 @@ a { color: inherit; }
 }
 .completion h2, .completion p { margin: 0; }
 .completion p { margin-top: 8px; color: var(--object-normal); word-break: keep-all; }
-.checkin-footer { width: 100%; padding: 24px 20px 32px; border-top: 1px solid var(--stroke-subtle); color: var(--object-subtle); }
+.checkin-footer {
+  width: 100%;
+  min-height: 218px;
+  padding: 24px 20px 32px;
+  flex: 1;
+  border-top: 1px solid var(--stroke-subtle);
+  color: var(--object-subtle);
+}
 .checkin-footer__links { display: flex; margin: 0; padding: 0; flex-wrap: wrap; gap: 10px 16px; list-style: none; }
 .checkin-footer__links a { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; line-height: 16px; text-decoration: none; }
 .checkin-footer__links a:hover { text-decoration: underline; }
