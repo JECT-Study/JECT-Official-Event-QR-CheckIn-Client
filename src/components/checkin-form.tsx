@@ -7,7 +7,7 @@ import { submitCheckin } from "@/lib/checkin";
 import type { CheckinEvent } from "@/lib/event";
 import { Spinner } from "./spinner";
 
-type FieldErrors = Partial<Record<"name" | "phone", string>>;
+type FieldErrors = Partial<Record<"name" | "phoneNumber", string>>;
 const SUBMISSION_TIMEOUT_MS = 5_000;
 const normalizePhone = (value: string) =>
   value.replace(/[^0-9]/g, "").slice(0, 11);
@@ -27,15 +27,15 @@ function connectDialogAccessibilityLabels(dialog: HTMLDivElement | null) {
   if (descriptionId && description) description.id = descriptionId;
 }
 
-function validate(name: string, phone: string): FieldErrors {
+function validate(name: string, phoneNumber: string): FieldErrors {
   const errors: FieldErrors = {};
   if (!name.trim()) errors.name = "이름을 입력해주세요.";
   else if (name.trim().length < 2)
     errors.name = "이름을 두 글자 이상 입력해주세요.";
-  const phoneNumbers = normalizePhone(phone);
-  if (!phoneNumbers) errors.phone = "연락처를 입력해주세요.";
+  const phoneNumbers = normalizePhone(phoneNumber);
+  if (!phoneNumbers) errors.phoneNumber = "연락처를 입력해주세요.";
   else if (!/^01[016789]\d{7,8}$/.test(phoneNumbers)) {
-    errors.phone = "올바른 휴대전화 번호를 입력해주세요.";
+    errors.phoneNumber = "올바른 휴대전화 번호를 입력해주세요.";
   }
   return errors;
 }
@@ -53,7 +53,7 @@ export function CheckinForm({
 }: CheckinFormProps) {
   const { toast } = useToast();
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneNumber, setPhone] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [isPending, setIsPending] = useState(false);
   const [failureMessage, setFailureMessage] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export function CheckinForm({
   const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
     if (isPending) return;
-    const nextErrors = validate(name, phone);
+    const nextErrors = validate(name, phoneNumber);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       return;
@@ -79,10 +79,14 @@ export function CheckinForm({
     }, SUBMISSION_TIMEOUT_MS);
 
     try {
-      const result = await submitCheckin(event.id, event.submissionEndpoint, {
-        name: name.trim(),
-        phone: normalizePhone(phone),
-      }, controller.signal);
+      const result = await submitCheckin(
+        event.submissionEndpoint,
+        {
+          name: name.trim(),
+          phoneNumber: normalizePhone(phoneNumber),
+        },
+        controller.signal,
+      );
       if (result.status === "success") {
         toast.positive("체크인이 완료되었습니다.");
         onComplete();
@@ -124,19 +128,22 @@ export function CheckinForm({
             required
           />
           <TextField
-            name="phone"
+            name="phoneNumber"
             type="tel"
             inputMode="numeric"
             label="휴대폰 번호"
             placeholder="01012345678"
-            value={phone}
+            value={phoneNumber}
             onChange={(event) => {
               setPhone(normalizePhone(event.target.value));
-              if (errors.phone)
-                setErrors((current) => ({ ...current, phone: undefined }));
+              if (errors.phoneNumber)
+                setErrors((current) => ({
+                  ...current,
+                  phoneNumber: undefined,
+                }));
             }}
-            validation={errors.phone ? "error" : "none"}
-            helperText={errors.phone}
+            validation={errors.phoneNumber ? "error" : "none"}
+            helperText={errors.phoneNumber}
             autoComplete="tel"
             disabled={isPending}
             required
@@ -151,7 +158,12 @@ export function CheckinForm({
           <span className="checkin-submit__content">
             제출하기
             {isPending && (
-              <Spinner size={16} strokeWidth={2} aria-hidden="true" role={undefined} />
+              <Spinner
+                size={16}
+                strokeWidth={2}
+                aria-hidden="true"
+                role={undefined}
+              />
             )}
           </span>
         </BlockButton.Basic>

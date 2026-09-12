@@ -37,8 +37,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Check-in API contract
 
-When `/` is rendered, the server requests
-`GET {CHECKIN_API_BASE_URL}/dev/events/active` and expects:
+When `/` is rendered, the browser requests
+`GET {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/dev/events/active` and expects:
 
 ```json
 {
@@ -68,10 +68,21 @@ On submit, the client sends `POST` to `submissionEndpoint` with:
 
 ```json
 {
-  "eventId": "event-id",
   "name": "김젝트",
-  "phone": "01012345678"
+  "phoneNumber": "01012345678"
 }
 ```
 
-`CHECKIN_API_BASE_URL` defaults to `https://checkin-api.ject.kr`. Check-in submission remains mocked until its API contract is connected.
+`NEXT_PUBLIC_CHECKIN_API_BASE_URL` defaults to `https://checkin-api.ject.kr`.
+
+During `next dev`, leaving `NEXT_PUBLIC_CHECKIN_API_BASE_URL` unset makes the
+browser request `/api/*`. The development-only Next.js rewrite proxies those
+requests to `https://checkin-api.ject.kr/*`, avoiding local CORS restrictions.
+Production builds do not include this rewrite and remain fully static.
+
+## Static deployment
+
+The application is fully client-rendered and configured with `output: "export"`.
+Run `pnpm build` and deploy the generated `out` directory to any static file
+host. The API must allow browser requests from the deployed origin through its
+CORS policy.

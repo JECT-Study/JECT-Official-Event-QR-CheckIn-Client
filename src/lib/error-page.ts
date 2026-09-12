@@ -9,9 +9,5 @@ export const ERROR_PAGE_CONTENT = {
   },
 } as const;
 
-export type ErrorPageType = keyof typeof ERROR_PAGE_CONTENT;
-export type ErrorPageContent = (typeof ERROR_PAGE_CONTENT)[ErrorPageType];
-
-export function isErrorPageType(value: string): value is ErrorPageType {
-  return value in ERROR_PAGE_CONTENT;
-}
+export type ErrorPageContent =
+  (typeof ERROR_PAGE_CONTENT)[keyof typeof ERROR_PAGE_CONTENT];

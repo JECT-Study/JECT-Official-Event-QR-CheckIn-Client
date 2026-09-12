@@ -72,12 +72,21 @@ function formatEventDateTime(value: string): string {
   return `${year}년 ${Number(month)}월 ${Number(day)}일(${weekday}) ${hour}:${minute}`;
 }
 
-export async function getActiveCheckinEvent(): Promise<ActiveCheckinResult> {
+export async function getActiveCheckinEvent(
+  signal?: AbortSignal,
+): Promise<ActiveCheckinResult> {
   const apiBaseUrl =
-    process.env.CHECKIN_API_BASE_URL || "https://checkin-api.ject.kr";
-  const eventUrl = new URL("/dev/events/active", apiBaseUrl);
+    process.env.NEXT_PUBLIC_CHECKIN_API_BASE_URL ||
+    (process.env.NODE_ENV === "development"
+      ? "/api"
+      : "https://checkin-api.ject.kr");
+  const createApiUrl = (path: string) =>
+    apiBaseUrl.startsWith("http")
+      ? new URL(path, apiBaseUrl).toString()
+      : `${apiBaseUrl.replace(/\/$/, "")}${path}`;
+  const eventUrl = createApiUrl("/dev/events/active");
 
-  const response = await fetch(eventUrl, { cache: "no-store" });
+  const response = await fetch(eventUrl, { cache: "no-store", signal });
   const data: unknown = await response.json();
 
   if (response.status === 409 && isEventNotStartedResponse(data)) {
@@ -100,7 +109,7 @@ export async function getActiveCheckinEvent(): Promise<ActiveCheckinResult> {
       title: data.data.name,
       dateTime: formatEventDateTime(data.data.eventDateTime),
       description: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
-      submissionEndpoint: new URL("/events/active/check-in", apiBaseUrl).toString(),
+      submissionEndpoint: createApiUrl("/events/active/check-in"),
     },
   };
 }

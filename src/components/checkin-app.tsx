@@ -3,24 +3,75 @@
 import Image from "next/image";
 import { BlockButton } from "@jects/jds";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheckinFooter } from "./checkin-footer";
 import { CheckinForm } from "./checkin-form";
 import { CheckinHeader } from "./checkin-header";
 import { Providers } from "./providers";
-import type { ActiveCheckinResult } from "@/lib/event";
-import Spinner from "./spinner";
+import {
+  getActiveCheckinEvent,
+  type ActiveCheckinResult,
+} from "@/lib/event";
 
-export default function CheckinApp({
-  result,
-}: {
-  result: ActiveCheckinResult;
-}) {
+export default function CheckinApp() {
   const router = useRouter();
-  const [isRefreshing, startRefreshing] = useTransition();
+  const requestController = useRef<AbortController | null>(null);
+  const [result, setResult] = useState<ActiveCheckinResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [checkinStatus, setCheckinStatus] = useState<
     "form" | "completed" | "already-checked-in"
   >("form");
+
+  const loadActiveEvent = useCallback(async () => {
+    requestController.current?.abort();
+    const controller = new AbortController();
+    requestController.current = controller;
+    setIsLoading(true);
+
+    try {
+      const nextResult = await getActiveCheckinEvent(controller.signal);
+      setResult(nextResult);
+      setCheckinStatus("form");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      router.replace("/error/invalid-access");
+    } finally {
+      if (requestController.current === controller) {
+        setIsLoading(false);
+      }
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestController.current = controller;
+
+    getActiveCheckinEvent(controller.signal)
+      .then((nextResult) => {
+        setResult(nextResult);
+        setCheckinStatus("form");
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        router.replace("/error/invalid-access");
+      })
+      .finally(() => {
+        if (requestController.current === controller) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => controller.abort();
+  }, [router]);
+
+  if (!result) {
+    return (
+      <div className="checkin-loading" role="status">
+        체크인 폼을 불러오고 있습니다.
+      </div>
+    );
+  }
+
   const event = result.status === "available" ? result.event : null;
 
   const description = event
@@ -32,7 +83,7 @@ export default function CheckinApp({
     : "체크인 가능 시간이 아닙니다.";
 
   const refresh = () => {
-    startRefreshing(() => router.refresh());
+    void loadActiveEvent();
   };
 
   return (
@@ -75,10 +126,10 @@ export default function CheckinApp({
                   type="button"
                   size="md"
                   hierarchy="tertiary"
-                  disabled={isRefreshing}
+                  disabled={isLoading}
                   onClick={refresh}
                 >
-                  {isRefreshing ? "새로 고침 중..." : "페이지 새로 고침"}
+                  {isLoading ? "새로 고침 중..." : "페이지 새로 고침"}
                 </BlockButton.Basic>
               </div>
             )}
