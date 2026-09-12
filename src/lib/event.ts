@@ -75,7 +75,7 @@ function formatEventDateTime(value: string): string {
 export async function getActiveCheckinEvent(): Promise<ActiveCheckinResult> {
   const apiBaseUrl =
     process.env.CHECKIN_API_BASE_URL || "https://checkin-api.ject.kr";
-  const eventUrl = new URL("/events/active", apiBaseUrl);
+  const eventUrl = new URL("/dev/events/active", apiBaseUrl);
 
   const response = await fetch(eventUrl, { cache: "no-store" });
   const data: unknown = await response.json();
@@ -100,7 +100,7 @@ export async function getActiveCheckinEvent(): Promise<ActiveCheckinResult> {
       title: data.data.name,
       dateTime: formatEventDateTime(data.data.eventDateTime),
       description: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
-      submissionEndpoint: "mock://checkin/active",
+      submissionEndpoint: new URL("/events/active/check-in", apiBaseUrl).toString(),
     },
   };
 }
