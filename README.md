@@ -37,16 +37,17 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Check-in API contract
 
-QR links use `/checkin/{eventSlug}`. On page render, the server requests
-`GET {CHECKIN_API_BASE_URL}/events/{eventSlug}` and expects:
+When `/` is rendered, the server requests
+`GET {CHECKIN_API_BASE_URL}/dev/events/active` and expects:
 
 ```json
 {
-  "id": "event-id",
-  "title": "Event title",
-  "dateTime": "2026년 9월 19일(토) 13:00",
-  "description": "Optional form description",
-  "submissionEndpoint": "/events/event-id/check-ins"
+  "status": "SUCCESS",
+  "data": {
+    "name": "[테스트] 온보딩",
+    "eventDateTime": "2026-09-19T12:30:00"
+  },
+  "timestamp": "2026-09-12T07:11:02.195566558Z"
 }
 ```
 
@@ -60,4 +61,4 @@ On submit, the client sends `POST` to `submissionEndpoint` with:
 }
 ```
 
-When `CHECKIN_API_BASE_URL` is empty, local mock event and submission responses are used.
+`CHECKIN_API_BASE_URL` defaults to `https://checkin-api.ject.kr`. Check-in submission remains mocked until its API contract is connected.

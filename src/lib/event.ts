@@ -7,52 +7,61 @@ export type CheckinEvent = {
   submissionEndpoint: string;
 };
 
-const MOCK_EVENT: CheckinEvent = {
-  id: "event-ject-5th-onboarding",
-  slug: "ject-5th-onboarding",
-  title: "젝트 5기 온보딩 체크인",
-  dateTime: "2026년 9월 19일(토) 13:00",
-  description: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
-  submissionEndpoint: "mock://checkin/ject-5th-onboarding",
+type ActiveEventResponse = {
+  status: "SUCCESS";
+  data: {
+    name: string;
+    eventDateTime: string;
+  };
+  timestamp: string;
 };
 
-type EventResponse = Omit<CheckinEvent, "slug" | "description"> & { description?: string };
-
-function isEventResponse(value: unknown): value is EventResponse {
+function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
   if (!value || typeof value !== "object") return false;
-  const event = value as Record<string, unknown>;
+  const response = value as Record<string, unknown>;
+  const event = response.data;
+
   return (
-    typeof event.id === "string" &&
-    typeof event.title === "string" &&
-    typeof event.dateTime === "string" &&
-    (event.description === undefined || typeof event.description === "string") &&
-    typeof event.submissionEndpoint === "string"
+    response.status === "SUCCESS" &&
+    typeof response.timestamp === "string" &&
+    !!event &&
+    typeof event === "object" &&
+    typeof (event as Record<string, unknown>).name === "string" &&
+    typeof (event as Record<string, unknown>).eventDateTime === "string"
   );
 }
 
-export async function getCheckinEvent(eventSlug: string): Promise<CheckinEvent> {
-  const apiBaseUrl = process.env.CHECKIN_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL;
+function formatEventDateTime(value: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value);
+  if (!match) throw new Error("Event date time does not match the expected format");
 
-  if (!apiBaseUrl) {
-    return { ...MOCK_EVENT, slug: eventSlug };
-  }
+  const [, year, month, day, hour, minute] = match;
+  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  const weekday = weekdays[new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).getUTCDay()];
 
-  const eventUrl = new URL(`/events/${encodeURIComponent(eventSlug)}`, apiBaseUrl);
+  return `${year}년 ${Number(month)}월 ${Number(day)}일(${weekday}) ${hour}:${minute}`;
+}
+
+export async function getActiveCheckinEvent(): Promise<CheckinEvent> {
+  const apiBaseUrl = process.env.CHECKIN_API_BASE_URL || "https://checkin-api.ject.kr";
+  const eventUrl = new URL("/dev/events/active", apiBaseUrl);
+
   const response = await fetch(eventUrl, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Event lookup failed with status ${response.status}`);
   }
 
   const data: unknown = await response.json();
-  if (!isEventResponse(data)) {
+  if (!isActiveEventResponse(data)) {
     throw new Error("Event response does not match the expected schema");
   }
 
   return {
-    ...data,
-    slug: eventSlug,
-    description:
-      data.description ?? "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
-    submissionEndpoint: new URL(data.submissionEndpoint, eventUrl).toString(),
+    id: "active",
+    slug: "active",
+    title: data.data.name,
+    dateTime: formatEventDateTime(data.data.eventDateTime),
+    description: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
+    submissionEndpoint: "mock://checkin/active",
   };
 }

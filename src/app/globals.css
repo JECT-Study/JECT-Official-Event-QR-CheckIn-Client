@@ -49,6 +49,36 @@ a {
   color: var(--object-subtle);
   font-size: 14px;
 }
+.spinner {
+  display: inline-block;
+  flex: none;
+  overflow: visible;
+  vertical-align: middle;
+  animation: spinner-rotation 2s linear infinite;
+}
+.spinner__arc {
+  transform: rotate(-90deg);
+  transform-origin: center;
+  stroke-dasharray: 0.95 0.05;
+  animation: spinner-arc 2s linear infinite;
+}
+@keyframes spinner-rotation {
+  to {
+    transform: rotate(720deg);
+  }
+}
+@keyframes spinner-arc {
+  0% {
+    stroke-dasharray: 0.222 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.5, 1);
+  }
+  50% {
+    stroke-dasharray: 0.778 1;
+  }
+  100% {
+    stroke-dasharray: 0.222 1;
+  }
+}
 .checkin-header {
   width: 100%;
   border-bottom: 1px solid var(--stroke-subtle);
