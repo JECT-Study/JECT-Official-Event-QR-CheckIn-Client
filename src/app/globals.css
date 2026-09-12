@@ -93,6 +93,12 @@ a {
   align-items: center;
   gap: 10px;
 }
+.checkin-header__home {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
 .checkin-header__label {
   padding-left: 10px;
   border-left: 1px solid var(--stroke-subtle);

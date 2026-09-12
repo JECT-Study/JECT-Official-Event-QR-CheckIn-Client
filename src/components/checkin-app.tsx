@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "@jects/jds";
+import Image from "next/image";
 import { CheckinFooter } from "./checkin-footer";
 import { CheckinForm } from "./checkin-form";
 import { CheckinHeader } from "./checkin-header";
@@ -20,7 +20,7 @@ export default function CheckinApp({ event }: { event: CheckinEvent }) {
                 {event.title}
               </h1>
               <p className="event-date semantic-textStyle-body-xs-normal">
-                <Icon name="calendar-line" size="2xs" aria-hidden="true" />
+                <Image src="/calendar.svg" width={16} height={16} alt="" />
                 <time>{event.dateTime}</time>
               </p>
               <Spinner />
