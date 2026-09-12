@@ -3,13 +3,13 @@ import { ClientOnlyCheckin } from "@/components/client-only-checkin";
 import { getActiveCheckinEvent } from "@/lib/event";
 
 export default async function Home() {
-  let event;
+  let result;
 
   try {
-    event = await getActiveCheckinEvent();
+    result = await getActiveCheckinEvent();
   } catch {
     redirect("/error/invalid-access");
   }
 
-  return <ClientOnlyCheckin event={event} />;
+  return <ClientOnlyCheckin result={result} />;
 }

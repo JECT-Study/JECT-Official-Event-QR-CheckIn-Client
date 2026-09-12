@@ -7,12 +7,14 @@ import { submitCheckin } from "@/lib/checkin";
 import type { CheckinEvent } from "@/lib/event";
 
 type FieldErrors = Partial<Record<"name" | "phone", string>>;
-const normalizePhone = (value: string) => value.replace(/[^0-9]/g, "").slice(0, 11);
+const normalizePhone = (value: string) =>
+  value.replace(/[^0-9]/g, "").slice(0, 11);
 
 function validate(name: string, phone: string): FieldErrors {
   const errors: FieldErrors = {};
   if (!name.trim()) errors.name = "이름을 입력해주세요.";
-  else if (name.trim().length < 2) errors.name = "이름을 두 글자 이상 입력해주세요.";
+  else if (name.trim().length < 2)
+    errors.name = "이름을 두 글자 이상 입력해주세요.";
   const phoneNumbers = normalizePhone(phone);
   if (!phoneNumbers) errors.phone = "연락처를 입력해주세요.";
   else if (!/^01[016789]\d{7,8}$/.test(phoneNumbers)) {
@@ -65,10 +67,18 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
 
   if (isComplete) {
     return (
-      <section className="completion" aria-labelledby="completion-title" aria-live="polite">
-        <span className="completion__icon" aria-hidden="true"><Icon name="check-line" size="xl" /></span>
+      <section
+        className="completion"
+        aria-labelledby="completion-title"
+        aria-live="polite"
+      >
+        <span className="completion__icon" aria-hidden="true">
+          <Icon name="check-line" size="xl" />
+        </span>
         <div>
-          <h2 id="completion-title" className="semantic-textStyle-title-6">체크인이 완료되었습니다</h2>
+          <h2 id="completion-title" className="semantic-textStyle-title-6">
+            체크인이 완료되었습니다
+          </h2>
           <p className="semantic-textStyle-body-sm-normal">
             {name}님, {event.title} 출석이 확인되었습니다.
           </p>
@@ -87,7 +97,8 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
           value={name}
           onChange={(event) => {
             setName(event.target.value);
-            if (errors.name) setErrors((current) => ({ ...current, name: undefined }));
+            if (errors.name)
+              setErrors((current) => ({ ...current, name: undefined }));
           }}
           validation={errors.name ? "error" : "none"}
           helperText={errors.name}
@@ -104,7 +115,8 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
           value={phone}
           onChange={(event) => {
             setPhone(normalizePhone(event.target.value));
-            if (errors.phone) setErrors((current) => ({ ...current, phone: undefined }));
+            if (errors.phone)
+              setErrors((current) => ({ ...current, phone: undefined }));
           }}
           validation={errors.phone ? "error" : "none"}
           helperText={errors.phone}
@@ -113,7 +125,12 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
           required
         />
       </div>
-      <BlockButton.Basic type="submit" size="md" hierarchy="primary" disabled={isPending}>
+      <BlockButton.Basic
+        type="submit"
+        size="md"
+        hierarchy="primary"
+        disabled={isPending}
+      >
         {isPending ? "제출 중..." : "제출하기"}
       </BlockButton.Basic>
     </form>

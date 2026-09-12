@@ -51,6 +51,19 @@ When `/` is rendered, the server requests
 }
 ```
 
+Before check-in opens, the endpoint can respond with HTTP `409`:
+
+```json
+{
+  "status": "EVENT-004",
+  "data": ["아직 체크인 시작 시각이 되지 않았습니다."],
+  "timestamp": "2026-09-12T13:52:45.075021709Z"
+}
+```
+
+The page then hides the form and shows a refresh button. Refreshing reruns the
+uncached active-event request.
+
 On submit, the client sends `POST` to `submissionEndpoint` with:
 
 ```json
