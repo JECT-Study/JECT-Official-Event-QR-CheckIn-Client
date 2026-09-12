@@ -1,8 +1,6 @@
 "use client";
 
-import { CheckinFooter } from "./checkin-footer";
-import { CheckinHeader } from "./checkin-header";
-import { Providers } from "./providers";
+import { AppShell } from "./app-shell";
 import type { ErrorPageContent } from "@/lib/error-page";
 
 function WarningSymbol() {
@@ -17,20 +15,23 @@ function WarningSymbol() {
 
 export default function ErrorPage({ content }: { content: ErrorPageContent }) {
   return (
-    <Providers>
-      <div className="site-shell error-shell">
-        <CheckinHeader />
-        <main className="error-main">
-          <section className="error-page" aria-labelledby="error-title">
-            <WarningSymbol />
-            <div className="error-page__copy">
-              <h1 id="error-title" className="semantic-textStyle-label-lg-bold">{content.title}</h1>
-              <p className="semantic-textStyle-body-xs-normal">{content.description}</p>
-            </div>
-          </section>
-        </main>
-        <CheckinFooter />
-      </div>
-    </Providers>
+    <AppShell className="error-shell">
+      <main className="error-main">
+        <section className="error-page" aria-labelledby="error-title">
+          <WarningSymbol />
+          <div className="error-page__copy">
+            <h1
+              id="error-title"
+              className="semantic-textStyle-label-lg-bold"
+            >
+              {content.title}
+            </h1>
+            <p className="semantic-textStyle-body-xs-normal">
+              {content.description}
+            </p>
+          </div>
+        </section>
+      </main>
+    </AppShell>
   );
 }

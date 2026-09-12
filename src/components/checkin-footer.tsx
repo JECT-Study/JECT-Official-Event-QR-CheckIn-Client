@@ -15,14 +15,17 @@ export function CheckinFooter() {
           {LINKS.map(([label, href]) => (
             <li key={label}>
               <a href={href} target="_blank" rel="noreferrer">
-                {label}<Icon name="external-link-line" size="2xs" aria-hidden="true" />
+                {label}
+                <Icon name="external-link-line" size="2xs" aria-hidden="true" />
               </a>
             </li>
           ))}
         </ul>
       </nav>
-      <p className="checkin-footer__copyright">jectofficial@ject.kr</p>
-      <p className="checkin-footer__copyright">© 2026 JECT. All rights reserved.</p>
+      <p className="checkin-footer__copyright">
+        <span>jectofficial@ject.kr</span>
+        <span>© 2026 JECT. All rights reserved.</span>
+      </p>
     </footer>
   );
 }

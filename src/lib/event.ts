@@ -1,9 +1,8 @@
+import { API_PATHS, createApiUrl } from "./api";
+
 export type CheckinEvent = {
-  id: string;
-  slug: string;
   title: string;
   dateTime: string;
-  description: string;
   submissionEndpoint: string;
 };
 
@@ -75,16 +74,7 @@ function formatEventDateTime(value: string): string {
 export async function getActiveCheckinEvent(
   signal?: AbortSignal,
 ): Promise<ActiveCheckinResult> {
-  const apiBaseUrl =
-    process.env.NEXT_PUBLIC_CHECKIN_API_BASE_URL ||
-    (process.env.NODE_ENV === "development"
-      ? "/api"
-      : "https://checkin-api.ject.kr");
-  const createApiUrl = (path: string) =>
-    apiBaseUrl.startsWith("http")
-      ? new URL(path, apiBaseUrl).toString()
-      : `${apiBaseUrl.replace(/\/$/, "")}${path}`;
-  const eventUrl = createApiUrl("/dev/events/active");
+  const eventUrl = createApiUrl(API_PATHS.activeEvent);
 
   const response = await fetch(eventUrl, { cache: "no-store", signal });
   const data: unknown = await response.json();
@@ -104,12 +94,9 @@ export async function getActiveCheckinEvent(
   return {
     status: "available",
     event: {
-      id: "active",
-      slug: "active",
       title: data.data.name,
       dateTime: formatEventDateTime(data.data.eventDateTime),
-      description: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
-      submissionEndpoint: createApiUrl("/events/active/check-in"),
+      submissionEndpoint: createApiUrl(API_PATHS.activeEventCheckin),
     },
   };
 }

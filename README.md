@@ -64,7 +64,8 @@ Before check-in opens, the endpoint can respond with HTTP `409`:
 The page then hides the form and shows a refresh button. Refreshing reruns the
 uncached active-event request.
 
-On submit, the client sends `POST` to `submissionEndpoint` with:
+On submit, the client sends
+`POST {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/events/active/check-in` with:
 
 ```json
 {
