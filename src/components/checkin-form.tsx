@@ -1,11 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useState } from "react";
-import { BlockButton, Dialog, Icon, TextField, useToast } from "@jects/jds";
+import { BlockButton, Dialog, TextField, Toast, useToast } from "@jects/jds";
 import { submitCheckin } from "@/lib/checkin";
 import type { CheckinEvent } from "@/lib/event";
+import { Spinner } from "./spinner";
 
 type FieldErrors = Partial<Record<"name" | "phone", string>>;
+const SUBMISSION_TIMEOUT_MS = 5_000;
 const normalizePhone = (value: string) =>
   value.replace(/[^0-9]/g, "").slice(0, 11);
 
@@ -37,14 +40,24 @@ function validate(name: string, phone: string): FieldErrors {
   return errors;
 }
 
-export function CheckinForm({ event }: { event: CheckinEvent }) {
+type CheckinFormProps = {
+  event: CheckinEvent;
+  onComplete: () => void;
+  onAlreadyCheckedIn: () => void;
+};
+
+export function CheckinForm({
+  event,
+  onComplete,
+  onAlreadyCheckedIn,
+}: CheckinFormProps) {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [isPending, setIsPending] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
   const [failureMessage, setFailureMessage] = useState<string | null>(null);
+  const [showDelayToast, setShowDelayToast] = useState(false);
 
   const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
@@ -52,54 +65,43 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
     const nextErrors = validate(name, phone);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
-      toast.destructive("입력 내용을 다시 확인해주세요.");
       return;
     }
 
     setIsPending(true);
+    setShowDelayToast(false);
+    const controller = new AbortController();
+    let didTimeout = false;
+    const timeout = window.setTimeout(() => {
+      didTimeout = true;
+      setShowDelayToast(true);
+      controller.abort();
+    }, SUBMISSION_TIMEOUT_MS);
+
     try {
       const result = await submitCheckin(event.id, event.submissionEndpoint, {
         name: name.trim(),
         phone: normalizePhone(phone),
-      });
+      }, controller.signal);
       if (result.status === "success") {
-        setIsComplete(true);
         toast.positive("체크인이 완료되었습니다.");
+        onComplete();
       } else if (result.status === "duplicate") {
-        setFailureMessage("이미 체크인이 완료된 정보입니다.");
+        onAlreadyCheckedIn();
       } else if (result.status === "invalid-event") {
         setFailureMessage("체크인할 수 없는 행사입니다.");
       } else {
         setFailureMessage("잠시 후 다시 시도해주세요.");
       }
     } catch {
-      setFailureMessage("잠시 후 다시 시도해주세요.");
+      if (!didTimeout) {
+        setFailureMessage("잠시 후 다시 시도해주세요.");
+      }
     } finally {
+      window.clearTimeout(timeout);
       setIsPending(false);
     }
   };
-
-  if (isComplete) {
-    return (
-      <section
-        className="completion"
-        aria-labelledby="completion-title"
-        aria-live="polite"
-      >
-        <span className="completion__icon" aria-hidden="true">
-          <Icon name="check-line" size="xl" />
-        </span>
-        <div>
-          <h2 id="completion-title" className="semantic-textStyle-title-6">
-            체크인이 완료되었습니다
-          </h2>
-          <p className="semantic-textStyle-body-sm-normal">
-            {name}님, {event.title} 출석이 확인되었습니다.
-          </p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <>
@@ -146,9 +148,28 @@ export function CheckinForm({ event }: { event: CheckinEvent }) {
           hierarchy="primary"
           disabled={isPending}
         >
-          {isPending ? "제출 중..." : "제출하기"}
+          <span className="checkin-submit__content">
+            제출하기
+            {isPending && (
+              <Spinner size={16} strokeWidth={2} aria-hidden="true" role={undefined} />
+            )}
+          </span>
         </BlockButton.Basic>
       </form>
+      {showDelayToast && (
+        <div className="submission-delay-toast">
+          <Toast.Basic
+            id="submission-delay"
+            title={
+              <span className="submission-delay-toast__message">
+                <Image src="/caution.svg" width={16} height={16} alt="" />
+                <span>응답이 지연되고 있습니다. 다시 시도해주세요.</span>
+              </span>
+            }
+            onRemove={() => setShowDelayToast(false)}
+          />
+        </div>
+      )}
       <Dialog
         ref={connectDialogAccessibilityLabels}
         open={failureMessage !== null}

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { BlockButton } from "@jects/jds";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { CheckinFooter } from "./checkin-footer";
 import { CheckinForm } from "./checkin-form";
 import { CheckinHeader } from "./checkin-header";
@@ -18,7 +18,18 @@ export default function CheckinApp({
 }) {
   const router = useRouter();
   const [isRefreshing, startRefreshing] = useTransition();
+  const [checkinStatus, setCheckinStatus] = useState<
+    "form" | "completed" | "already-checked-in"
+  >("form");
   const event = result.status === "available" ? result.event : null;
+
+  const description = event
+    ? checkinStatus === "completed"
+      ? "체크인이 완료되었습니다."
+      : checkinStatus === "already-checked-in"
+        ? "이미 체크인 처리되었습니다."
+        : event.description
+    : "체크인 가능 시간이 아닙니다.";
 
   const refresh = () => {
     startRefreshing(() => router.refresh());
@@ -43,16 +54,22 @@ export default function CheckinApp({
                     <Image src="/calendar.svg" width={16} height={16} alt="" />
                     <time>{event.dateTime}</time>
                   </p>
-                  <Spinner />
                 </>
               )}
               <p className="event-description semantic-textStyle-body-sm-normal">
-                {event ? event.description : "체크인 가능 시간이 아닙니다."}
+                {description}
               </p>
             </header>
-            {event ? (
-              <CheckinForm event={event} />
-            ) : (
+            {event && checkinStatus === "form" && (
+              <CheckinForm
+                event={event}
+                onComplete={() => setCheckinStatus("completed")}
+                onAlreadyCheckedIn={() =>
+                  setCheckinStatus("already-checked-in")
+                }
+              />
+            )}
+            {!event && (
               <div className="checkin-form">
                 <BlockButton.Basic
                   type="button"

@@ -143,6 +143,22 @@ a {
   flex-direction: column;
   gap: 24px;
 }
+.checkin-submit__content,
+.submission-delay-toast__message {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.submission-delay-toast__message > img {
+  flex: none;
+}
+.submission-delay-toast {
+  position: fixed;
+  right: 50%;
+  bottom: 24px;
+  z-index: 9999;
+  transform: translateX(50%);
+}
 .completion {
   display: flex;
   margin-top: 48px;
