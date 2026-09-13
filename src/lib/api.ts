@@ -1,5 +1,8 @@
 const PRODUCTION_API_BASE_URL = "https://checkin-api.ject.kr";
 const DEVELOPMENT_API_BASE_URL = "/api";
+const ALLOWED_PRODUCTION_API_ORIGINS = new Set([
+  new URL(PRODUCTION_API_BASE_URL).origin,
+]);
 
 export const API_PATHS = {
   activeEvent: "/dev/events/active",
@@ -33,12 +36,37 @@ export async function readJson(response: Response): Promise<unknown> {
 }
 
 function getApiBaseUrl() {
-  return (
+  const baseUrl =
     process.env.NEXT_PUBLIC_CHECKIN_API_BASE_URL ||
     (process.env.NODE_ENV === "development"
       ? DEVELOPMENT_API_BASE_URL
-      : PRODUCTION_API_BASE_URL)
-  );
+      : PRODUCTION_API_BASE_URL);
+
+  if (process.env.NODE_ENV === "development" && baseUrl.startsWith("/")) {
+    return baseUrl;
+  }
+
+  let apiUrl: URL;
+
+  try {
+    apiUrl = new URL(baseUrl);
+  } catch {
+    throw new Error("체크인 API 주소가 올바른 URL 형식이 아닙니다.");
+  }
+
+  if (apiUrl.username || apiUrl.password) {
+    throw new Error("체크인 API 주소에는 인증 정보를 포함할 수 없습니다.");
+  }
+
+  if (
+    process.env.NODE_ENV !== "development" &&
+    (apiUrl.protocol !== "https:" ||
+      !ALLOWED_PRODUCTION_API_ORIGINS.has(apiUrl.origin))
+  ) {
+    throw new Error("허용되지 않은 운영 체크인 API 주소입니다.");
+  }
+
+  return apiUrl.origin;
 }
 
 export function createApiUrl(path: string) {
