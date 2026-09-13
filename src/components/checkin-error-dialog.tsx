@@ -1,9 +1,10 @@
 "use client";
 
 import { Dialog } from "@jects/jds";
+import type { CheckinDialogContent } from "@/lib/checkin";
 
-type FailureDialogProps = {
-  message: string | null;
+type CheckinErrorDialogProps = {
+  content: CheckinDialogContent | null;
   onClose: () => void;
 };
 
@@ -20,16 +21,19 @@ function connectAccessibilityLabels(dialog: HTMLDivElement | null) {
   if (descriptionId && description) description.id = descriptionId;
 }
 
-export function FailureDialog({ message, onClose }: FailureDialogProps) {
+export function CheckinErrorDialog({
+  content,
+  onClose,
+}: CheckinErrorDialogProps) {
   return (
     <Dialog
       ref={connectAccessibilityLabels}
-      open={message !== null}
+      open={content !== null}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      header="체크인에 실패했습니다"
-      body={message ?? ""}
+      header={content?.title ?? ""}
+      body={content?.body ?? ""}
       isButtonStretched
       primaryAction={{
         children: "확인",

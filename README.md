@@ -64,6 +64,13 @@ Before check-in opens, the endpoint can respond with HTTP `409`:
 The page then hides the form and shows a refresh button. Refreshing reruns the
 uncached active-event request.
 
+Check-in error handling is based on the response body's `status` code:
+
+- `CHECKIN-001`: show the closed-check-in dialog.
+- `CHECKIN-002`: hide the form and show the already-checked-in message.
+- `CHECKIN-003` through `CHECKIN-005`: show the API message in a support dialog.
+- Any other error: navigate to `/error/checkin-failed`.
+
 On submit, the client sends
 `POST {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/events/active/check-in` with:
 

@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useToast } from "@jects/jds";
-import { submitCheckin, type CheckinInput } from "@/lib/checkin";
+import { useRouter } from "next/navigation";
+import {
+  submitCheckin,
+  type CheckinDialogContent,
+  type CheckinInput,
+} from "@/lib/checkin";
 import { isAbortError } from "@/lib/errors";
 
 const SUBMISSION_TIMEOUT_MS = 5_000;
@@ -19,8 +24,10 @@ export function useCheckinSubmission({
   onAlreadyCheckedIn,
 }: UseCheckinSubmissionOptions) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const [failureMessage, setFailureMessage] = useState<string | null>(null);
+  const [dialogContent, setDialogContent] =
+    useState<CheckinDialogContent | null>(null);
   const [isDelayToastOpen, setIsDelayToastOpen] = useState(false);
 
   const submit = async (input: CheckinInput) => {
@@ -45,19 +52,19 @@ export function useCheckinSubmission({
           toast.positive("체크인이 완료되었습니다.");
           onComplete();
           break;
-        case "duplicate":
+        case "already-checked-in":
           onAlreadyCheckedIn();
           break;
-        case "invalid-event":
-          setFailureMessage("체크인할 수 없는 행사입니다.");
+        case "dialog":
+          setDialogContent(result.content);
           break;
-        case "error":
-          setFailureMessage("잠시 후 다시 시도해주세요.");
+        case "unhandled-error":
+          router.push("/error/checkin-failed");
           break;
       }
     } catch (error) {
       if (!(didTimeout && isAbortError(error))) {
-        setFailureMessage("잠시 후 다시 시도해주세요.");
+        router.push("/error/checkin-failed");
       }
     } finally {
       window.clearTimeout(timeout);
@@ -66,11 +73,11 @@ export function useCheckinSubmission({
   };
 
   return {
-    failureMessage,
+    dialogContent,
     isDelayToastOpen,
     isPending,
     closeDelayToast: () => setIsDelayToastOpen(false),
-    closeFailureDialog: () => setFailureMessage(null),
+    closeDialog: () => setDialogContent(null),
     submit,
   };
 }

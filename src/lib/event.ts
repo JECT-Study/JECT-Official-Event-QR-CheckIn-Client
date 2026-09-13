@@ -1,4 +1,9 @@
-import { API_PATHS, createApiUrl } from "./api";
+import {
+  API_PATHS,
+  createApiUrl,
+  isApiErrorResponse,
+  readJson,
+} from "./api";
 
 export type CheckinEvent = {
   title: string;
@@ -12,12 +17,6 @@ type ActiveEventResponse = {
     name: string;
     eventDateTime: string;
   };
-  timestamp: string;
-};
-
-type EventNotStartedResponse = {
-  status: "EVENT-004";
-  data: string[];
   timestamp: string;
 };
 
@@ -37,20 +36,6 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
     typeof event === "object" &&
     typeof (event as Record<string, unknown>).name === "string" &&
     typeof (event as Record<string, unknown>).eventDateTime === "string"
-  );
-}
-
-function isEventNotStartedResponse(
-  value: unknown,
-): value is EventNotStartedResponse {
-  if (!value || typeof value !== "object") return false;
-  const response = value as Record<string, unknown>;
-
-  return (
-    response.status === "EVENT-004" &&
-    Array.isArray(response.data) &&
-    response.data.every((message) => typeof message === "string") &&
-    typeof response.timestamp === "string"
   );
 }
 
@@ -77,9 +62,13 @@ export async function getActiveCheckinEvent(
   const eventUrl = createApiUrl(API_PATHS.activeEvent);
 
   const response = await fetch(eventUrl, { cache: "no-store", signal });
-  const data: unknown = await response.json();
+  const data = await readJson(response);
 
-  if (response.status === 409 && isEventNotStartedResponse(data)) {
+  if (
+    response.status === 409 &&
+    isApiErrorResponse(data) &&
+    data.status === "EVENT-004"
+  ) {
     return { status: "not-started" };
   }
 

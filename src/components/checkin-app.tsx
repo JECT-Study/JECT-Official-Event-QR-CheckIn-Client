@@ -81,7 +81,7 @@ export default function CheckinApp() {
                 disabled={isLoading}
                 onClick={refresh}
               >
-                {isLoading ? "새로 고침 중..." : "페이지 새로 고침"}
+                {isLoading ? "새로 고침 중..." : "새로 고침"}
               </BlockButton.Basic>
             </div>
           )}

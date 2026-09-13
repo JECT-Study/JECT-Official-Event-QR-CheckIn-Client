@@ -9,7 +9,7 @@ import {
 } from "@/lib/checkin-validation";
 import type { CheckinEvent } from "@/lib/event";
 import { useCheckinSubmission } from "@/hooks/use-checkin-submission";
-import { FailureDialog } from "./failure-dialog";
+import { CheckinErrorDialog } from "./checkin-error-dialog";
 import { Spinner } from "./spinner";
 import { SubmissionDelayToast } from "./submission-delay-toast";
 
@@ -29,8 +29,8 @@ export function CheckinForm({
   const [errors, setErrors] = useState<CheckinFieldErrors>({});
   const {
     closeDelayToast,
-    closeFailureDialog,
-    failureMessage,
+    closeDialog,
+    dialogContent,
     isDelayToastOpen,
     isPending,
     submit,
@@ -118,7 +118,7 @@ export function CheckinForm({
         open={isDelayToastOpen}
         onClose={closeDelayToast}
       />
-      <FailureDialog message={failureMessage} onClose={closeFailureDialog} />
+      <CheckinErrorDialog content={dialogContent} onClose={closeDialog} />
     </>
   );
 }

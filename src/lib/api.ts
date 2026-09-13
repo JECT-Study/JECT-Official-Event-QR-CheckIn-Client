@@ -6,6 +6,32 @@ export const API_PATHS = {
   activeEventCheckin: "/events/active/check-in",
 } as const;
 
+export type ApiErrorResponse = {
+  status: string;
+  data: string[];
+  timestamp: string;
+};
+
+export function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
+  if (!value || typeof value !== "object") return false;
+  const response = value as Record<string, unknown>;
+
+  return (
+    typeof response.status === "string" &&
+    Array.isArray(response.data) &&
+    response.data.every((message) => typeof message === "string") &&
+    typeof response.timestamp === "string"
+  );
+}
+
+export async function readJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 function getApiBaseUrl() {
   return (
     process.env.NEXT_PUBLIC_CHECKIN_API_BASE_URL ||
