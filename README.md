@@ -38,7 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Check-in API contract
 
 When `/` is rendered, the browser requests
-`GET {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/dev/events/active` and expects:
+`GET {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/events/active` and expects:
 
 ```json
 {

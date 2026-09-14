@@ -5,7 +5,7 @@ const ALLOWED_PRODUCTION_API_ORIGINS = new Set([
 ]);
 
 export const API_PATHS = {
-  activeEvent: "/dev/events/active",
+  activeEvent: "/events/active",
   activeEventCheckin: "/events/active/check-in",
 } as const;
 
