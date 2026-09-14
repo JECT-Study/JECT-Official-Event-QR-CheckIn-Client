@@ -3,7 +3,7 @@ import { Icon } from "@jects/jds";
 const LINKS = [
   ["공식 웹사이트", "https://ject.kr"],
   ["GitHub", "https://github.com/JECT-Study"],
-  ["Instagram", "https://www.instagram.com/ject_official"],
+  ["Instagram", "https://www.instagram.com/ject.official"],
   ["JDS", "https://www.figma.com/community/file/1547190026603503566"],
 ] as const;
 
