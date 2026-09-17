@@ -129,12 +129,6 @@ body {
   flex-direction: column;
   gap: 28px;
 }
-.checkin-submit__content,
-.submission-delay-toast__message {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
 .submission-delay-toast__message > img {
   flex: none;
 }

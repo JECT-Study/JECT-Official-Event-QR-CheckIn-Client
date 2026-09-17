@@ -101,23 +101,18 @@ export function CheckinForm({
           hierarchy="primary"
           disabled={isPending}
         >
-          <span className="checkin-submit__content">
-            제출하기
-            {isPending && (
-              <Spinner
-                size={16}
-                strokeWidth={2}
-                aria-hidden="true"
-                role={undefined}
-              />
-            )}
-          </span>
+          제출하기
+          {isPending && (
+            <Spinner
+              size={16}
+              strokeWidth={2}
+              aria-hidden="true"
+              role={undefined}
+            />
+          )}
         </BlockButton.Basic>
       </form>
-      <SubmissionDelayToast
-        open={isDelayToastOpen}
-        onClose={closeDelayToast}
-      />
+      <SubmissionDelayToast open={isDelayToastOpen} onClose={closeDelayToast} />
       <CheckinErrorDialog content={dialogContent} onClose={closeDialog} />
     </>
   );
