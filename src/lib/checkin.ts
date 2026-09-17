@@ -17,6 +17,10 @@ export type CheckinResult =
 const SUPPORT_REQUEST_MESSAGE =
   "행사장 내 서포터즈에게 직접 체크인을 요청해주세요.";
 const SUPPORT_INQUIRY_MESSAGE = "행사장 내 서포터즈에게 문의해주세요";
+const MEMBER_VERIFICATION_FAILURE_CONTENT: CheckinDialogContent = {
+  title: "구성원 확인을 실패했습니다",
+  body: "작성 항목들을 다시 확인해주세요. 동일한 문제가 계속 발생한다면 서포터즈에 문의해주세요.",
+};
 const CHECKIN_INQUIRY_ERROR_CODES = new Set<string>([
   API_ERROR_CODES.checkinConfigurationRequired,
   API_ERROR_CODES.checkinSaveFailed,
@@ -27,9 +31,21 @@ function classifyCheckinError(
   httpStatus: number,
   response: unknown,
 ): CheckinResult {
-  if (httpStatus !== 409 || !isApiErrorResponse(response)) {
+  if (!isApiErrorResponse(response)) {
     return { status: "unhandled-error" };
   }
+
+  if (
+    httpStatus === 404 &&
+    response.status === API_ERROR_CODES.notionMemberNotFound
+  ) {
+    return {
+      status: "dialog",
+      content: MEMBER_VERIFICATION_FAILURE_CONTENT,
+    };
+  }
+
+  if (httpStatus !== 409) return { status: "unhandled-error" };
 
   switch (response.status) {
     case API_ERROR_CODES.checkinClosed:

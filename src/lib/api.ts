@@ -16,6 +16,7 @@ export const API_ERROR_CODES = {
   checkinConfigurationRequired: "CHECKIN-003",
   checkinSaveFailed: "CHECKIN-004",
   memberMismatch: "CHECKIN-005",
+  notionMemberNotFound: "NOTION-003",
 } as const;
 
 export type ApiErrorResponse = {
