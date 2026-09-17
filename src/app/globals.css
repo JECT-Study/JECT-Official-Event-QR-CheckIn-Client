@@ -1,6 +1,11 @@
 @import "tailwindcss";
-@import "../../node_modules/@jects/jds/dist/theme.css";
-@import "../../node_modules/@jects/jds/dist/index.css";
+@import "@jects/jds/styles";
+
+:root {
+  --typo-primitive-typeface-title: var(--font-pretendard);
+  --typo-primitive-typeface-label: var(--font-pretendard);
+  --typo-primitive-typeface-body: var(--font-pretendard);
+}
 
 * {
   box-sizing: border-box;
@@ -9,7 +14,7 @@ html,
 body {
   min-height: 100%;
   margin: 0;
-  background: var(--semantic-surface-deeper);
+  background: var(--color-semantic-surface-deeper);
   font-family:
     var(--font-pretendard), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
@@ -22,13 +27,13 @@ body {
   min-height: 100dvh;
   margin: 0 auto;
   flex-direction: column;
-  background: var(--semantic-surface-standard);
+  background: var(--color-semantic-surface-standard);
 }
 .checkin-loading {
   display: grid;
   min-height: 100dvh;
   place-items: center;
-  color: var(--semantic-object-neutral);
+  color: var(--color-semantic-object-neutral);
   font-size: 14px;
 }
 .spinner {
@@ -63,27 +68,22 @@ body {
 }
 .checkin-header {
   width: 100%;
-  border-bottom: 1px solid var(--semantic-stroke-alpha-subtler);
+  border-bottom: 1px solid var(--color-semantic-stroke-alpha-subtler);
   background: rgb(255 255 255 / 96%);
+  padding: 12px 28px;
 }
 .checkin-header__inner {
   display: flex;
-  width: min(100%, 922px);
-  height: 52px;
-  margin: 0 auto;
-  padding: 0 20px;
   align-items: center;
-  gap: 10px;
 }
 .checkin-header__home {
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-}
-.checkin-header__label {
-  padding-left: 10px;
-  border-left: 1px solid var(--semantic-stroke-alpha-subtler);
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
 }
 .checkin-main {
   display: flex;
@@ -103,7 +103,7 @@ body {
 }
 .event-title {
   margin-bottom: 10px;
-  color: var(--semantic-object-boldest);
+  color: var(--color-semantic-object-boldest);
   word-break: keep-all;
 }
 .event-date {
@@ -111,10 +111,10 @@ body {
   align-items: center;
   gap: 8px;
   margin-bottom: 24px;
-  color: var(--semantic-object-normal);
+  color: var(--color-semantic-object-normal);
 }
 .event-description {
-  color: var(--semantic-object-neutral);
+  color: var(--color-semantic-object-neutral);
   word-break: keep-all;
 }
 .checkin-form {
@@ -129,23 +129,27 @@ body {
   flex-direction: column;
   gap: 28px;
 }
-.submission-delay-toast__message > img {
-  flex: none;
+
+.checkin-form__fields__label {
+  color: var(--color-semantic-object-neutral);
 }
-.submission-delay-toast {
-  position: fixed;
-  right: 50%;
-  bottom: 24px;
-  z-index: 9999;
-  transform: translateX(50%);
+.checkin-form__field-input {
+  color: var(--color-semantic-object-bolder);
+}
+.checkin-form__field-input::placeholder {
+  color: var(--color-semantic-object-assistive);
+  opacity: 1;
+}
+.checkin-form__submit-button {
+  padding: 10px 20px;
 }
 .checkin-footer {
   width: 100%;
   min-height: 218px;
   padding: 24px 20px 32px;
   flex: 1;
-  border-top: 1px solid var(--semantic-stroke-alpha-subtler);
-  color: var(--semantic-object-neutral);
+  border-top: 1px solid var(--color-semantic-stroke-alpha-subtler);
+  color: var(--color-semantic-object-neutral);
 }
 .checkin-footer__links {
   display: flex;
@@ -207,7 +211,7 @@ body {
 
 .error-page__copy p {
   margin-top: 8px;
-  color: var(--semantic-object-neutral);
+  color: var(--color-semantic-object-neutral);
 }
 
 @media (prefers-reduced-motion: reduce) {

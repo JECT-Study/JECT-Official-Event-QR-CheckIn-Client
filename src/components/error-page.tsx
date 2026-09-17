@@ -1,5 +1,6 @@
 "use client";
 
+import { textStyles } from "@jects/jds/tokens";
 import { AppShell } from "./app-shell";
 import type { ErrorPageContent } from "@/lib/error-page";
 
@@ -22,11 +23,11 @@ export default function ErrorPage({ content }: { content: ErrorPageContent }) {
           <div className="error-page__copy">
             <h1
               id="error-title"
-              className="semantic-textStyle-label-lg-bold"
+              style={textStyles.label.lg.bold}
             >
               {content.title}
             </h1>
-            <p className="semantic-textStyle-body-xs-normal">
+            <p style={textStyles.body.xs.normal}>
               {content.description}
             </p>
           </div>

@@ -64,7 +64,7 @@ export function useCheckinSubmission({
       }
     } catch (error) {
       if (!(didTimeout && isAbortError(error))) {
-        router.push("/error/checkin-failed");
+        toast.notifying("연결이 불안정합니다. 다시 시도해주세요.");
       }
     } finally {
       window.clearTimeout(timeout);

@@ -16,7 +16,7 @@ export function CheckinFooter() {
             <li key={label}>
               <a href={href} target="_blank" rel="noreferrer">
                 {label}
-                <Icon name="external-link-line" size="2xs" aria-hidden="true" />
+                <Icon name="external-link" size="2xs" aria-hidden="true" />
               </a>
             </li>
           ))}

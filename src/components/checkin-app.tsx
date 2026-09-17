@@ -1,6 +1,7 @@
 "use client";
 
 import { BlockButton } from "@jects/jds";
+import { textStyles } from "@jects/jds/tokens";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
@@ -50,16 +51,16 @@ export default function CheckinApp() {
           <header className="event-summary">
             {event && (
               <>
-                <h1 className="event-title semantic-textStyle-title-4">
+                <h1 className="event-title" style={textStyles.title[4]}>
                   {event.title}
                 </h1>
-                <p className="event-date semantic-textStyle-body-xs-normal">
+                <p className="event-date" style={textStyles.label.md.normal}>
                   <CalendarIcon />
                   <time>{event.dateTime}</time>
                 </p>
               </>
             )}
-            <p className="event-description semantic-textStyle-body-sm-normal">
+            <p className="event-description" style={textStyles.body.md.normal}>
               {description}
             </p>
           </header>
@@ -72,15 +73,15 @@ export default function CheckinApp() {
           )}
           {!event && (
             <div className="checkin-form">
-              <BlockButton.Basic
+              <BlockButton
                 type="button"
                 size="md"
-                hierarchy="tertiary"
+                hierarchy="secondary"
                 disabled={isLoading}
                 onClick={refresh}
               >
                 {isLoading ? "새로 고침 중..." : "새로 고침"}
-              </BlockButton.Basic>
+              </BlockButton>
             </div>
           )}
         </section>

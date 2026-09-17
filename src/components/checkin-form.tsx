@@ -11,7 +11,7 @@ import type { CheckinEvent } from "@/lib/event";
 import { useCheckinSubmission } from "@/hooks/use-checkin-submission";
 import { CheckinErrorDialog } from "./checkin-error-dialog";
 import { Spinner } from "./spinner";
-import { SubmissionDelayToast } from "./submission-delay-toast";
+import { textStyles } from "@jects/jds/tokens";
 
 type CheckinFormProps = {
   event: CheckinEvent;
@@ -27,18 +27,12 @@ export function CheckinForm({
   const [name, setName] = useState("");
   const [phoneNumber, setPhone] = useState("");
   const [errors, setErrors] = useState<CheckinFieldErrors>({});
-  const {
-    closeDelayToast,
-    closeDialog,
-    dialogContent,
-    isDelayToastOpen,
-    isPending,
-    submit,
-  } = useCheckinSubmission({
-    endpoint: event.submissionEndpoint,
-    onComplete,
-    onAlreadyCheckedIn,
-  });
+  const { closeDialog, dialogContent, isPending, submit } =
+    useCheckinSubmission({
+      endpoint: event.submissionEndpoint,
+      onComplete,
+      onAlreadyCheckedIn,
+    });
 
   const handleSubmit = async (formEvent: FormEvent<HTMLFormElement>) => {
     formEvent.preventDefault();
@@ -58,46 +52,78 @@ export function CheckinForm({
       <form className="checkin-form" onSubmit={handleSubmit} noValidate>
         <div className="checkin-form__fields">
           <TextField
-            name="name"
-            label="이름"
-            placeholder="김젝트"
-            value={name}
-            onChange={(event) => {
-              setName(event.target.value);
-              if (errors.name)
-                setErrors((current) => ({ ...current, name: undefined }));
-            }}
-            validation={errors.name ? "error" : "none"}
-            helperText={errors.name}
-            autoComplete="name"
+            status={errors.name ? "error" : "default"}
             disabled={isPending}
             required
-          />
+          >
+            <TextField.Label
+              className="checkin-form__fields__label"
+              style={textStyles.label.sm.normal}
+            >
+              이름
+            </TextField.Label>
+            <TextField.Input
+              className="checkin-form__field-input"
+              style={textStyles.body.md.normal}
+              name="name"
+              placeholder="김젝트"
+              value={name}
+              onChange={(event) => {
+                setName(event.target.value);
+                if (errors.name)
+                  setErrors((current) => ({ ...current, name: undefined }));
+              }}
+              autoComplete="name"
+              required
+            />
+            {errors.name && (
+              <TextField.Footer>
+                <TextField.Helper>{errors.name}</TextField.Helper>
+              </TextField.Footer>
+            )}
+          </TextField>
           <TextField
-            name="phoneNumber"
-            type="tel"
-            inputMode="numeric"
-            label="휴대폰 번호"
-            placeholder="01012345678"
-            value={phoneNumber}
-            onChange={(event) => {
-              setPhone(normalizePhoneNumber(event.target.value));
-              if (errors.phoneNumber)
-                setErrors((current) => ({
-                  ...current,
-                  phoneNumber: undefined,
-                }));
-            }}
-            validation={errors.phoneNumber ? "error" : "none"}
-            helperText={errors.phoneNumber}
-            autoComplete="tel"
+            status={errors.phoneNumber ? "error" : "default"}
             disabled={isPending}
             required
-          />
+          >
+            <TextField.Label
+              className="checkin-form__fields__label"
+              style={textStyles.label.sm.normal}
+            >
+              휴대폰 번호
+            </TextField.Label>
+            <TextField.Input
+              className="checkin-form__field-input"
+              style={textStyles.body.md.normal}
+              name="phoneNumber"
+              type="tel"
+              inputMode="numeric"
+              placeholder="01012345678"
+              value={phoneNumber}
+              onChange={(event) => {
+                setPhone(normalizePhoneNumber(event.target.value));
+                if (errors.phoneNumber)
+                  setErrors((current) => ({
+                    ...current,
+                    phoneNumber: undefined,
+                  }));
+              }}
+              autoComplete="tel"
+              required
+            />
+            {errors.phoneNumber && (
+              <TextField.Footer>
+                <TextField.Helper>{errors.phoneNumber}</TextField.Helper>
+              </TextField.Footer>
+            )}
+          </TextField>
         </div>
-        <BlockButton.Basic
+        <BlockButton
           type="submit"
           size="md"
+          className="checkin-form__submit-button"
+          style={textStyles.label.lg.bold}
           hierarchy="primary"
           disabled={isPending}
         >
@@ -110,9 +136,8 @@ export function CheckinForm({
               role={undefined}
             />
           )}
-        </BlockButton.Basic>
+        </BlockButton>
       </form>
-      <SubmissionDelayToast open={isDelayToastOpen} onClose={closeDelayToast} />
       <CheckinErrorDialog content={dialogContent} onClose={closeDialog} />
     </>
   );
