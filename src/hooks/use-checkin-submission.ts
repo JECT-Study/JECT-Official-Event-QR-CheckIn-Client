@@ -48,10 +48,6 @@ export function useCheckinSubmission({
       const result = await submitCheckin(endpoint, input, controller.signal);
 
       switch (result.status) {
-        case "success":
-          toast.positive("체크인이 완료되었습니다.");
-          onComplete();
-          break;
         case "already-checked-in":
           onAlreadyCheckedIn();
           break;
