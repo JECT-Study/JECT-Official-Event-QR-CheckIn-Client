@@ -16,12 +16,18 @@ export function CheckinErrorDialog({
 
   return (
     <Dialog
+      ref={(element) => {
+        if (element) element.dataset.checkinDialog = "";
+      }}
       open
+      buttonLayout="vertical"
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
       header={content.title}
-      body={content.body}
+      body={
+        <span className="checkin-dialog__description">{content.body}</span>
+      }
       primaryAction={{
         children: "확인",
         onClick: onClose,

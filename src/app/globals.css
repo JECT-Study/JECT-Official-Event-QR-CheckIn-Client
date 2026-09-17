@@ -140,6 +140,19 @@ body {
 .checkin-form__submit-button {
   padding: 10px 20px;
 }
+
+[data-checkin-dialog] > h2 {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.checkin-dialog__description {
+  display: block;
+  text-align: center;
+  word-break: keep-all;
+}
+
 .checkin-footer {
   width: 100%;
   min-height: 218px;
