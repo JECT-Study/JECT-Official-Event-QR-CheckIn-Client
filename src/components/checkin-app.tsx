@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { BlockButton } from "@jects/jds";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { CheckinForm } from "./checkin-form";
+import { CalendarIcon } from "./icons/calendar-icon";
 import { LoadingScreen } from "./loading-screen";
 import { useActiveCheckinEvent } from "@/hooks/use-active-checkin-event";
 
@@ -54,7 +54,7 @@ export default function CheckinApp() {
                   {event.title}
                 </h1>
                 <p className="event-date semantic-textStyle-body-xs-normal">
-                  <Image src="/calendar.svg" width={16} height={16} alt="" />
+                  <CalendarIcon />
                   <time>{event.dateTime}</time>
                 </p>
               </>
