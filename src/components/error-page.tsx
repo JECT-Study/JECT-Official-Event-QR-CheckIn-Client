@@ -12,7 +12,11 @@ export default function ErrorPage({ content }: { content: ErrorPageContent }) {
         <section className="error-page" aria-labelledby="error-title">
           <Image src="/warning.svg" width={64} height={64} alt="" />
           <div className="error-page__copy">
-            <h1 className="error-title" style={textStyles.title[1]}>
+            <h1
+              id="error-title"
+              className="error-title"
+              style={textStyles.title[1]}
+            >
               {content.title}
             </h1>
             <p style={textStyles.body.md.normal}>{content.description}</p>

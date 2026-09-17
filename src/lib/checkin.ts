@@ -1,4 +1,10 @@
-import { isApiErrorResponse, readJson } from "./api";
+import {
+  API_ERROR_CODES,
+  API_PATHS,
+  createApiUrl,
+  isApiErrorResponse,
+  readJson,
+} from "./api";
 
 export type CheckinInput = { name: string; phoneNumber: string };
 export type CheckinDialogContent = { title: string; body: string };
@@ -11,6 +17,11 @@ export type CheckinResult =
 const SUPPORT_REQUEST_MESSAGE =
   "행사장 내 서포터즈에게 직접 체크인을 요청해주세요.";
 const SUPPORT_INQUIRY_MESSAGE = "행사장 내 서포터즈에게 문의해주세요";
+const CHECKIN_INQUIRY_ERROR_CODES = new Set<string>([
+  API_ERROR_CODES.checkinConfigurationRequired,
+  API_ERROR_CODES.checkinSaveFailed,
+  API_ERROR_CODES.memberMismatch,
+]);
 
 function classifyCheckinError(
   httpStatus: number,
@@ -21,7 +32,7 @@ function classifyCheckinError(
   }
 
   switch (response.status) {
-    case "CHECKIN-001":
+    case API_ERROR_CODES.checkinClosed:
       return {
         status: "dialog",
         content: {
@@ -29,29 +40,28 @@ function classifyCheckinError(
           body: SUPPORT_REQUEST_MESSAGE,
         },
       };
-    case "CHECKIN-002":
+    case API_ERROR_CODES.alreadyCheckedIn:
       return { status: "already-checked-in" };
-    case "CHECKIN-003":
-    case "CHECKIN-004":
-    case "CHECKIN-005":
-      return {
-        status: "dialog",
-        content: {
-          title: response.data[0] || "체크인 처리에 실패했습니다.",
-          body: SUPPORT_INQUIRY_MESSAGE,
-        },
-      };
-    default:
-      return { status: "unhandled-error" };
   }
+
+  if (CHECKIN_INQUIRY_ERROR_CODES.has(response.status)) {
+    return {
+      status: "dialog",
+      content: {
+        title: response.data[0] || "체크인 처리에 실패했습니다.",
+        body: SUPPORT_INQUIRY_MESSAGE,
+      },
+    };
+  }
+
+  return { status: "unhandled-error" };
 }
 
 export async function submitCheckin(
-  submissionEndpoint: string,
   input: CheckinInput,
   signal?: AbortSignal,
 ): Promise<CheckinResult> {
-  const response = await fetch(submissionEndpoint, {
+  const response = await fetch(createApiUrl(API_PATHS.activeEventCheckin), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),

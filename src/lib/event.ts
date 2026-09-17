@@ -1,4 +1,5 @@
 import {
+  API_ERROR_CODES,
   API_PATHS,
   createApiUrl,
   isApiErrorResponse,
@@ -8,7 +9,6 @@ import {
 export type CheckinEvent = {
   title: string;
   dateTime: string;
-  submissionEndpoint: string;
 };
 
 type ActiveEventResponse = {
@@ -19,6 +19,10 @@ type ActiveEventResponse = {
   };
   timestamp: string;
 };
+
+const EVENT_DATE_TIME_PATTERN =
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/;
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 
 export type ActiveCheckinResult =
   | { status: "available"; event: CheckinEvent }
@@ -40,20 +44,32 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
 }
 
 function formatEventDateTime(value: string): string {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(value);
+  const match = EVENT_DATE_TIME_PATTERN.exec(value);
   if (!match)
     throw new Error("Event date time does not match the expected format");
 
   const [, year, month, day, hour, minute] = match;
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-  const weekday =
-    weekdays[
-      new Date(
-        Date.UTC(Number(year), Number(month) - 1, Number(day)),
-      ).getUTCDay()
-    ];
+  const dateParts = [year, month, day, hour, minute].map(Number);
+  const [yearNumber, monthNumber, dayNumber, hourNumber, minuteNumber] =
+    dateParts;
+  const date = new Date(
+    Date.UTC(yearNumber, monthNumber - 1, dayNumber, hourNumber, minuteNumber),
+  );
 
-  return `${year}년 ${Number(month)}월 ${Number(day)}일(${weekday}) ${hour}:${minute}`;
+  const isValidDate =
+    date.getUTCFullYear() === yearNumber &&
+    date.getUTCMonth() === monthNumber - 1 &&
+    date.getUTCDate() === dayNumber &&
+    date.getUTCHours() === hourNumber &&
+    date.getUTCMinutes() === minuteNumber;
+
+  if (!isValidDate) {
+    throw new Error("Event date time contains an invalid date");
+  }
+
+  const weekday = WEEKDAYS[date.getUTCDay()];
+
+  return `${yearNumber}년 ${monthNumber}월 ${dayNumber}일(${weekday}) ${hour}:${minute}`;
 }
 
 export async function getActiveCheckinEvent(
@@ -67,7 +83,7 @@ export async function getActiveCheckinEvent(
   if (
     response.status === 409 &&
     isApiErrorResponse(data) &&
-    data.status === "EVENT-004"
+    data.status === API_ERROR_CODES.eventNotStarted
   ) {
     return { status: "not-started" };
   }
@@ -85,7 +101,6 @@ export async function getActiveCheckinEvent(
     event: {
       title: data.data.name,
       dateTime: formatEventDateTime(data.data.eventDateTime),
-      submissionEndpoint: createApiUrl(API_PATHS.activeEventCheckin),
     },
   };
 }

@@ -12,14 +12,16 @@ export function CheckinErrorDialog({
   content,
   onClose,
 }: CheckinErrorDialogProps) {
+  if (!content) return null;
+
   return (
     <Dialog
-      open={content !== null}
+      open
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      header={content?.title ?? ""}
-      body={content?.body ?? ""}
+      header={content.title}
+      body={content.body}
       primaryAction={{
         children: "확인",
         onClick: onClose,

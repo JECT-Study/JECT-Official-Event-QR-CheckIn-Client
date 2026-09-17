@@ -1,78 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JECT 행사 체크인
 
-## Getting Started
+JECT 오프라인 행사에서 QR로 접근해 이름과 휴대폰 번호를 제출하는 모바일 웹 클라이언트입니다. Next.js 정적 export로 빌드되며 런타임에는 브라우저에서 체크인 API를 직접 호출합니다.
 
-First, run the development server:
+## 개발 환경
+
+- Node.js 22 이상
+- pnpm 11
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+로컬 개발 시 `NEXT_PUBLIC_CHECKIN_API_BASE_URL`을 지정하지 않으면 `/api` 요청을 `https://checkin-api.ject.kr`로 프록시합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 주요 명령어
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Check-in API contract
-
-When `/` is rendered, the browser requests
-`GET {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/events/active` and expects:
-
-```json
-{
-  "status": "SUCCESS",
-  "data": {
-    "name": "[테스트] 온보딩",
-    "eventDateTime": "2026-09-19T12:30:00"
-  },
-  "timestamp": "2026-09-12T07:11:02.195566558Z"
-}
+```bash
+pnpm lint
+pnpm typecheck
+pnpm check
+pnpm security:audit
+pnpm build
 ```
 
-Before check-in opens, the endpoint can respond with HTTP `409`:
+`pnpm build` 결과는 `out/`에 생성됩니다.
 
-```json
-{
-  "status": "EVENT-004",
-  "data": ["아직 체크인 시작 시각이 되지 않았습니다."],
-  "timestamp": "2026-09-12T13:52:45.075021709Z"
-}
+## 환경변수
+
+```bash
+NEXT_PUBLIC_CHECKIN_API_BASE_URL=https://checkin-api.ject.kr
 ```
 
-The page then hides the form and shows a refresh button. Refreshing reruns the
-uncached active-event request.
+운영 빌드는 개인정보가 다른 서버로 전송되지 않도록 `https://checkin-api.ject.kr` origin만 허용합니다.
 
-Check-in error handling is based on the response body's `status` code:
+## API 흐름
 
-- `CHECKIN-001`: show the closed-check-in dialog.
-- `CHECKIN-002`: hide the form and show the already-checked-in message.
-- `CHECKIN-003` through `CHECKIN-005`: show the API message in a support dialog.
-- Any other error: navigate to `/error/checkin-failed`.
-
-On submit, the client sends
-`POST {NEXT_PUBLIC_CHECKIN_API_BASE_URL}/events/active/check-in` with:
+1. `/` 진입 시 `GET /events/active`로 활성 행사 정보를 조회합니다.
+2. `EVENT-004` 응답이면 폼 대신 새로 고침 버튼을 표시합니다.
+3. 폼 제출 시 `POST /events/active/check-in`으로 이름과 휴대폰 번호를 전송합니다.
+4. 체크인 도메인 오류는 코드별로 완료 상태, 안내 다이얼로그 또는 정적 오류 페이지로 분기합니다.
 
 ```json
 {
@@ -81,16 +48,18 @@ On submit, the client sends
 }
 ```
 
-`NEXT_PUBLIC_CHECKIN_API_BASE_URL` defaults to `https://checkin-api.ject.kr`.
+주요 응답 처리:
 
-During `next dev`, leaving `NEXT_PUBLIC_CHECKIN_API_BASE_URL` unset makes the
-browser request `/api/*`. The development-only Next.js rewrite proxies those
-requests to `https://checkin-api.ject.kr/*`, avoiding local CORS restrictions.
-Production builds do not include this rewrite and remain fully static.
+- `CHECKIN-001`: 체크인 마감 다이얼로그
+- `CHECKIN-002`: 이미 체크인 완료 상태
+- `CHECKIN-003`~`CHECKIN-005`: 현장 문의 다이얼로그
+- 그 밖의 제출 오류: `/error/checkin-failed`
 
-## Static deployment
+## 구조
 
-The application is fully client-rendered and configured with `output: "export"`.
-Run `pnpm build` and deploy the generated `out` directory to any static file
-host. The API must allow browser requests from the deployed origin through its
-CORS policy.
+- `src/lib`: API 계약, 응답 분류, 검증과 경로 상수
+- `src/hooks`: 활성 행사 조회 및 체크인 제출 상태
+- `src/components`: 화면과 JDS 기반 UI
+- `src/app`: 정적 라우트, 전역 스타일과 메타데이터
+
+JDS 스타일은 `@jects/jds/styles`, 타이포그래피는 `@jects/jds/tokens`의 `textStyles`를 사용합니다.

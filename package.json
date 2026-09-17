@@ -2,10 +2,16 @@
   "name": "ject-official-event-qr-checkin-client",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm lint && pnpm typecheck",
     "security:audit": "pnpm audit --prod --audit-level high"
   },
   "dependencies": {

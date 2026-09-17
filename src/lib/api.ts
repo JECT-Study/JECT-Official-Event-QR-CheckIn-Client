@@ -9,6 +9,15 @@ export const API_PATHS = {
   activeEventCheckin: "/events/active/check-in",
 } as const;
 
+export const API_ERROR_CODES = {
+  eventNotStarted: "EVENT-004",
+  checkinClosed: "CHECKIN-001",
+  alreadyCheckedIn: "CHECKIN-002",
+  checkinConfigurationRequired: "CHECKIN-003",
+  checkinSaveFailed: "CHECKIN-004",
+  memberMismatch: "CHECKIN-005",
+} as const;
+
 export type ApiErrorResponse = {
   status: string;
   data: string[];

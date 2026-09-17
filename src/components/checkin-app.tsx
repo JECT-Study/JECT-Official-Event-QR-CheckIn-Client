@@ -9,6 +9,7 @@ import { CheckinForm } from "./checkin-form";
 import { CalendarIcon } from "./icons/calendar-icon";
 import { LoadingScreen } from "./loading-screen";
 import { useActiveCheckinEvent } from "@/hooks/use-active-checkin-event";
+import { APP_ROUTES } from "@/lib/routes";
 
 type CheckinStatus = "form" | "completed" | "already-checked-in";
 
@@ -24,7 +25,7 @@ export default function CheckinApp() {
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus>("form");
 
   useEffect(() => {
-    if (error) router.replace("/error/invalid-access");
+    if (error) router.replace(APP_ROUTES.invalidAccess);
   }, [error, router]);
 
   if (!result) {
@@ -42,7 +43,7 @@ export default function CheckinApp() {
   };
 
   return (
-    <AppShell>
+    <AppShell onHomeClick={refresh}>
       <main className="checkin-main">
         <section
           className="checkin-content"
@@ -51,7 +52,11 @@ export default function CheckinApp() {
           <header className="event-summary">
             {event && (
               <>
-                <h1 className="event-title" style={textStyles.title[4]}>
+                <h1
+                  id="event-title"
+                  className="event-title"
+                  style={textStyles.title[4]}
+                >
                   {event.title}
                 </h1>
                 <p className="event-date" style={textStyles.label.md.normal}>
@@ -66,7 +71,6 @@ export default function CheckinApp() {
           </header>
           {event && checkinStatus === "form" && (
             <CheckinForm
-              event={event}
               onComplete={() => setCheckinStatus("completed")}
               onAlreadyCheckedIn={() => setCheckinStatus("already-checked-in")}
             />

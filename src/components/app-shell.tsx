@@ -8,15 +8,16 @@ import { Providers } from "./providers";
 type AppShellProps = {
   children: ReactNode;
   className?: string;
+  onHomeClick?: () => void;
 };
 
-export function AppShell({ children, className }: AppShellProps) {
+export function AppShell({ children, className, onHomeClick }: AppShellProps) {
   const classes = ["site-shell", className].filter(Boolean).join(" ");
 
   return (
     <Providers>
       <div className={classes}>
-        <CheckinHeader />
+        <CheckinHeader onHomeClick={onHomeClick} />
         {children}
         <CheckinFooter />
       </div>

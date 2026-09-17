@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useToast } from "@jects/jds";
 import { useRouter } from "next/navigation";
 import {
@@ -9,17 +9,16 @@ import {
   type CheckinInput,
 } from "@/lib/checkin";
 import { isAbortError } from "@/lib/errors";
+import { APP_ROUTES } from "@/lib/routes";
 
 const SUBMISSION_TIMEOUT_MS = 5_000;
 
 type UseCheckinSubmissionOptions = {
-  endpoint: string;
   onComplete: () => void;
   onAlreadyCheckedIn: () => void;
 };
 
 export function useCheckinSubmission({
-  endpoint,
   onComplete,
   onAlreadyCheckedIn,
 }: UseCheckinSubmissionOptions) {
@@ -28,26 +27,29 @@ export function useCheckinSubmission({
   const [isPending, setIsPending] = useState(false);
   const [dialogContent, setDialogContent] =
     useState<CheckinDialogContent | null>(null);
-  const [isDelayToastOpen, setIsDelayToastOpen] = useState(false);
+  const submissionLockRef = useRef(false);
 
-  const submit = async (input: CheckinInput) => {
-    if (isPending) return;
+  const submit = useCallback(async (input: CheckinInput) => {
+    if (submissionLockRef.current) return;
 
+    submissionLockRef.current = true;
     setIsPending(true);
-    setIsDelayToastOpen(false);
 
     const controller = new AbortController();
     let didTimeout = false;
     const timeout = window.setTimeout(() => {
       didTimeout = true;
-      setIsDelayToastOpen(true);
       controller.abort();
     }, SUBMISSION_TIMEOUT_MS);
 
     try {
-      const result = await submitCheckin(endpoint, input, controller.signal);
+      const result = await submitCheckin(input, controller.signal);
 
       switch (result.status) {
+        case "success":
+          toast.positive("체크인이 완료되었습니다.");
+          onComplete();
+          break;
         case "already-checked-in":
           onAlreadyCheckedIn();
           break;
@@ -55,24 +57,25 @@ export function useCheckinSubmission({
           setDialogContent(result.content);
           break;
         case "unhandled-error":
-          router.push("/error/checkin-failed");
+          router.push(APP_ROUTES.checkinFailed);
           break;
       }
     } catch (error) {
-      if (!(didTimeout && isAbortError(error))) {
+      if (didTimeout && isAbortError(error)) {
+        toast.notifying("응답이 지연되고 있습니다. 다시 시도해주세요.");
+      } else if (!isAbortError(error)) {
         toast.notifying("연결이 불안정합니다. 다시 시도해주세요.");
       }
     } finally {
       window.clearTimeout(timeout);
+      submissionLockRef.current = false;
       setIsPending(false);
     }
-  };
+  }, [onAlreadyCheckedIn, onComplete, router, toast]);
 
   return {
     dialogContent,
-    isDelayToastOpen,
     isPending,
-    closeDelayToast: () => setIsDelayToastOpen(false),
     closeDialog: () => setDialogContent(null),
     submit,
   };

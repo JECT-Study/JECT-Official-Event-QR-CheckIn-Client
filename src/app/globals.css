@@ -10,6 +10,7 @@
 * {
   box-sizing: border-box;
 }
+
 html,
 body {
   min-height: 100%;
@@ -34,8 +35,8 @@ body {
   min-height: 100dvh;
   place-items: center;
   color: var(--color-semantic-object-neutral);
-  font-size: 14px;
 }
+
 .spinner {
   display: inline-block;
   flex: none;
@@ -67,10 +68,10 @@ body {
   }
 }
 .checkin-header {
+  padding: 12px 28px;
   width: 100%;
   border-bottom: 1px solid var(--color-semantic-stroke-alpha-subtler);
-  background: rgb(255 255 255 / 96%);
-  padding: 12px 28px;
+  background: var(--color-semantic-surface-standard);
 }
 .checkin-header__inner {
   display: flex;
@@ -93,10 +94,7 @@ body {
 .checkin-content {
   width: 100%;
   max-width: 520px;
-  padding-top: 32px;
-  padding-bottom: 112px;
-  padding-left: 28px;
-  padding-right: 28px;
+  padding: 32px 28px 112px;
 }
 .event-summary {
   margin-bottom: 40px;
@@ -129,8 +127,7 @@ body {
   flex-direction: column;
   gap: 28px;
 }
-
-.checkin-form__fields__label {
+.checkin-form__field-label {
   color: var(--color-semantic-object-neutral);
 }
 .checkin-form__field-input {
@@ -148,7 +145,7 @@ body {
   min-height: 218px;
   padding: 24px 28px;
   flex: 1;
-  background-color: #f9f9f9;
+  background: var(--color-semantic-surface-deep);
 }
 .checkin-footer__links {
   display: flex;
@@ -160,7 +157,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  color: rgba(1, 1, 9, 0.54);
+  color: var(--color-semantic-object-alternative);
 }
 .checkin-footer__links a:hover {
   text-decoration: underline;
@@ -197,7 +194,7 @@ body {
 
 .error-page__copy p {
   margin-top: 8px;
-  color: rgba(1, 1, 9, 0.54);
+  color: var(--color-semantic-object-alternative);
 }
 
 @media (prefers-reduced-motion: reduce) {
