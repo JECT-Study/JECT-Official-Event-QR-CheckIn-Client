@@ -193,8 +193,10 @@ body {
 }
 
 .error-page__copy p {
-  margin-top: 8px;
   color: var(--color-semantic-object-alternative);
+}
+.error-page__copy h1 + p {
+  margin-top: 8px;
 }
 
 @media (prefers-reduced-motion: reduce) {
