@@ -146,26 +146,21 @@ body {
 .checkin-footer {
   width: 100%;
   min-height: 218px;
-  padding: 24px 20px 32px;
+  padding: 24px 28px;
   flex: 1;
-  border-top: 1px solid var(--color-semantic-stroke-alpha-subtler);
-  color: var(--color-semantic-object-neutral);
+  background-color: #f9f9f9;
 }
 .checkin-footer__links {
   display: flex;
-  margin: 0;
-  padding: 0;
   flex-wrap: wrap;
-  gap: 10px 16px;
+  gap: 12px;
   list-style: none;
 }
 .checkin-footer__links a {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
-  line-height: 16px;
-  text-decoration: none;
+  color: rgba(1, 1, 9, 0.54);
 }
 .checkin-footer__links a:hover {
   text-decoration: underline;
@@ -174,8 +169,7 @@ body {
   display: flex;
   gap: 16px;
   margin: 12px 0 0;
-  font-size: 10px;
-  line-height: 14px;
+  color: var(--color-semantic-object-assistive);
 }
 .error-main {
   display: flex;

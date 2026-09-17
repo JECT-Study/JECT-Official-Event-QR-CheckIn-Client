@@ -1,4 +1,5 @@
 import { Icon } from "@jects/jds";
+import { textStyles } from "@jects/jds/tokens";
 
 const LINKS = [
   ["공식 웹사이트", "https://ject.kr"],
@@ -14,7 +15,12 @@ export function CheckinFooter() {
         <ul className="checkin-footer__links">
           {LINKS.map(([label, href]) => (
             <li key={label}>
-              <a href={href} target="_blank" rel="noreferrer">
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                style={textStyles.label.sm.bold}
+              >
                 {label}
                 <Icon name="external-link" size="2xs" aria-hidden="true" />
               </a>
@@ -22,7 +28,10 @@ export function CheckinFooter() {
           ))}
         </ul>
       </nav>
-      <p className="checkin-footer__copyright">
+      <p
+        className="checkin-footer__copyright"
+        style={textStyles.label.xs.subtle}
+      >
         <span>jectofficial@ject.kr</span>
         <span>© 2026 JECT. All rights reserved.</span>
       </p>
