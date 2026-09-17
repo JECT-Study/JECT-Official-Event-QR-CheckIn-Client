@@ -50,7 +50,7 @@ export default function CheckinApp() {
           <header className="event-summary">
             {event && (
               <>
-                <h1 id="event-title" className="semantic-textStyle-title-4">
+                <h1 className="event-title semantic-textStyle-title-4">
                   {event.title}
                 </h1>
                 <p className="event-date semantic-textStyle-body-xs-normal">
@@ -67,9 +67,7 @@ export default function CheckinApp() {
             <CheckinForm
               event={event}
               onComplete={() => setCheckinStatus("completed")}
-              onAlreadyCheckedIn={() =>
-                setCheckinStatus("already-checked-in")
-              }
+              onAlreadyCheckedIn={() => setCheckinStatus("already-checked-in")}
             />
           )}
           {!event && (
