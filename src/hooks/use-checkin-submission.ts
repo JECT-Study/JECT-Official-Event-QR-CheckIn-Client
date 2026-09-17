@@ -47,6 +47,9 @@ export function useCheckinSubmission({
         const result = await submitCheckin(input, controller.signal);
 
         switch (result.status) {
+          case "success":
+            onComplete();
+            break;
           case "already-checked-in":
             onAlreadyCheckedIn();
             break;
