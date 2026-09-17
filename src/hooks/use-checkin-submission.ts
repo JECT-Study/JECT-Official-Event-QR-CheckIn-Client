@@ -29,49 +29,48 @@ export function useCheckinSubmission({
     useState<CheckinDialogContent | null>(null);
   const submissionLockRef = useRef(false);
 
-  const submit = useCallback(async (input: CheckinInput) => {
-    if (submissionLockRef.current) return;
+  const submit = useCallback(
+    async (input: CheckinInput) => {
+      if (submissionLockRef.current) return;
 
-    submissionLockRef.current = true;
-    setIsPending(true);
+      submissionLockRef.current = true;
+      setIsPending(true);
 
-    const controller = new AbortController();
-    let didTimeout = false;
-    const timeout = window.setTimeout(() => {
-      didTimeout = true;
-      controller.abort();
-    }, SUBMISSION_TIMEOUT_MS);
+      const controller = new AbortController();
+      let didTimeout = false;
+      const timeout = window.setTimeout(() => {
+        didTimeout = true;
+        controller.abort();
+      }, SUBMISSION_TIMEOUT_MS);
 
-    try {
-      const result = await submitCheckin(input, controller.signal);
+      try {
+        const result = await submitCheckin(input, controller.signal);
 
-      switch (result.status) {
-        case "success":
-          toast.positive("체크인이 완료되었습니다.");
-          onComplete();
-          break;
-        case "already-checked-in":
-          onAlreadyCheckedIn();
-          break;
-        case "dialog":
-          setDialogContent(result.content);
-          break;
-        case "unhandled-error":
-          router.push(APP_ROUTES.checkinFailed);
-          break;
+        switch (result.status) {
+          case "already-checked-in":
+            onAlreadyCheckedIn();
+            break;
+          case "dialog":
+            setDialogContent(result.content);
+            break;
+          case "unhandled-error":
+            router.push(APP_ROUTES.checkinFailed);
+            break;
+        }
+      } catch (error) {
+        if (didTimeout && isAbortError(error)) {
+          toast.notifying("응답이 지연되고 있습니다. 다시 시도해주세요.");
+        } else if (!isAbortError(error)) {
+          toast.notifying("연결이 불안정합니다. 다시 시도해주세요.");
+        }
+      } finally {
+        window.clearTimeout(timeout);
+        submissionLockRef.current = false;
+        setIsPending(false);
       }
-    } catch (error) {
-      if (didTimeout && isAbortError(error)) {
-        toast.notifying("응답이 지연되고 있습니다. 다시 시도해주세요.");
-      } else if (!isAbortError(error)) {
-        toast.notifying("연결이 불안정합니다. 다시 시도해주세요.");
-      }
-    } finally {
-      window.clearTimeout(timeout);
-      submissionLockRef.current = false;
-      setIsPending(false);
-    }
-  }, [onAlreadyCheckedIn, onComplete, router, toast]);
+    },
+    [onAlreadyCheckedIn, onComplete, router, toast],
+  );
 
   return {
     dialogContent,
