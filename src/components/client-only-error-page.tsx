@@ -6,7 +6,7 @@ import { LoadingScreen } from "./loading-screen";
 
 const ErrorPage = dynamic(() => import("./error-page"), {
   ssr: false,
-  loading: () => <LoadingScreen message="오류 안내를 불러오고 있습니다." />,
+  loading: () => <LoadingScreen />,
 });
 
 export function ClientOnlyErrorPage({ content }: { content: ErrorPageContent }) {

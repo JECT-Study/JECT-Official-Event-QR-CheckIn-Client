@@ -28,7 +28,7 @@ export default function CheckinApp() {
   }, [error, router]);
 
   if (!result) {
-    return <LoadingScreen message="체크인 폼을 불러오고 있습니다." />;
+    return <LoadingScreen />;
   }
 
   const event = result.status === "available" ? result.event : null;

@@ -1,11 +1,9 @@
-type LoadingScreenProps = {
-  message: string;
-};
+import { Spinner } from "./spinner";
 
-export function LoadingScreen({ message }: LoadingScreenProps) {
+export function LoadingScreen() {
   return (
-    <div className="checkin-loading" role="status">
-      {message}
+    <div className="checkin-loading">
+      <Spinner size={48} />
     </div>
   );
 }
