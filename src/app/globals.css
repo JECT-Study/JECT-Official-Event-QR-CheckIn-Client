@@ -273,3 +273,28 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+.event-timetable h2 {
+  margin: 0 0 16px;
+  color: var(--color-semantic-object-boldest);
+}
+.event-timetable__frame {
+  overflow: hidden;
+  border: 1px solid var(--color-semantic-stroke-subtle);
+  border-radius: 10px;
+}
+.event-timetable__table {
+  width: 100%;
+  table-layout: fixed;
+  border: 0;
+  border-radius: 0;
+}
+.event-timetable__table th,
+.event-timetable__table td {
+  text-align: left;
+  vertical-align: top;
+}
+.event-timetable__table td span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

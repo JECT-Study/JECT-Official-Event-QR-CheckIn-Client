@@ -77,6 +77,14 @@ export async function submitCheckin(
   input: CheckinInput,
   signal?: AbortSignal,
 ): Promise<CheckinResult> {
+  if (
+    process.env.NODE_ENV === "development" &&
+    process.env.NEXT_PUBLIC_MOCK_CHECKIN_EVENT === "true"
+  ) {
+    signal?.throwIfAborted();
+    return { status: "success" };
+  }
+
   const response = await fetch(createApiUrl(API_PATHS.activeEventCheckin), {
     method: "POST",
     headers: { "Content-Type": "application/json" },

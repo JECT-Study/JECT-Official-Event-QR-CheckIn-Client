@@ -5,6 +5,7 @@ import { textStyles } from "@jects/jds/tokens";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
+import { EventTimetable } from "./event-timetable";
 import { CheckinForm } from "./checkin-form";
 import { PinIcon } from "./icons/pin-icon";
 import { LoadingScreen } from "./loading-screen";
@@ -116,6 +117,9 @@ export default function CheckinApp() {
               onComplete={() => setCheckinStatus("completed")}
               onAlreadyCheckedIn={() => setCheckinStatus("already-checked-in")}
             />
+          )}
+          {event && checkinStatus !== "form" && (
+            <EventTimetable rows={event.timetable} />
           )}
           {!event && (
             <div className="checkin-form">

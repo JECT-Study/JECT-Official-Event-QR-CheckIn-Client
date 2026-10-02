@@ -6,8 +6,16 @@ import {
   readJson,
 } from "./api";
 
+export type EventTimetableRow = {
+  id: string;
+  startTime: string;
+  endTime: string;
+  content: string;
+};
+
 export type CheckinEvent = {
   title: string;
+  timetable: EventTimetableRow[];
   description?: string;
   date: string;
   month: number;
@@ -22,6 +30,7 @@ type ActiveEventResponse = {
   status: "SUCCESS";
   data: {
     name: string;
+    timetable?: EventTimetableRow[] | null;
     description?: string | null;
     eventDateTime: string;
     eventEndDateTime: string;
@@ -39,6 +48,24 @@ export type ActiveCheckinResult =
   | { status: "available"; event: CheckinEvent }
   | { status: "not-started" };
 
+function isEventTimetable(value: unknown): value is EventTimetableRow[] {
+  if (!Array.isArray(value)) return false;
+  const ids = new Set<string>();
+  const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+  return value.every((item: unknown) => {
+    if (!item || typeof item !== "object") return false;
+    const row = item as Record<string, unknown>;
+    if (
+      typeof row.id !== "string" || !row.id.trim() || ids.has(row.id) ||
+      typeof row.startTime !== "string" || !timePattern.test(row.startTime) ||
+      typeof row.endTime !== "string" || !timePattern.test(row.endTime) ||
+      typeof row.content !== "string" || !row.content.trim()
+    ) return false;
+    ids.add(row.id);
+    return true;
+  });
+}
+
 function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
   if (!value || typeof value !== "object") return false;
   const response = value as Record<string, unknown>;
@@ -50,6 +77,8 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
     !!event &&
     typeof event === "object" &&
     typeof (event as Record<string, unknown>).name === "string" &&
+    ((event as Record<string, unknown>).timetable == null ||
+      isEventTimetable((event as Record<string, unknown>).timetable)) &&
     ((event as Record<string, unknown>).description == null ||
       typeof (event as Record<string, unknown>).description === "string") &&
     ["eventDateTime", "eventEndDateTime", "eventLocationName", "eventLocationAddress"].every(
@@ -106,6 +135,12 @@ export async function getActiveCheckinEvent(
       status: "SUCCESS",
       data: {
         name: "JECT 행사 (테스트)",
+        timetable: [
+          { id: "checkin", startTime: "13:30", endTime: "14:00", content: "체크인" },
+          { id: "seminar", startTime: "14:10", endTime: "15:00", content: "젝트 협업 도구 세미나" },
+          { id: "break", startTime: "15:10", endTime: "15:30", content: "쉬는 시간" },
+          { id: "closing", startTime: "17:30", endTime: "18:00", content: "공지사항 안내, 만족도 조사, 파트별 단체사진" },
+        ],
         eventDateTime: "2026-10-10T14:00:00",
         eventEndDateTime: "2026-10-10T18:00:00",
         eventLocationName: "ICT CoC",
@@ -146,6 +181,7 @@ export async function getActiveCheckinEvent(
     status: "available",
     event: {
       title: data.data.name,
+      timetable: data.data.timetable ?? [],
       description: data.data.description?.trim() || undefined,
       date: start.date,
       month: start.month,
