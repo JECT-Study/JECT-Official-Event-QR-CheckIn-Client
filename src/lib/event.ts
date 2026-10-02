@@ -8,6 +8,7 @@ import {
 
 export type CheckinEvent = {
   title: string;
+  description?: string;
   date: string;
   month: number;
   day: number;
@@ -21,6 +22,7 @@ type ActiveEventResponse = {
   status: "SUCCESS";
   data: {
     name: string;
+    description?: string | null;
     eventDateTime: string;
     eventEndDateTime: string;
     eventLocationName: string;
@@ -48,6 +50,8 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
     !!event &&
     typeof event === "object" &&
     typeof (event as Record<string, unknown>).name === "string" &&
+    ((event as Record<string, unknown>).description == null ||
+      typeof (event as Record<string, unknown>).description === "string") &&
     ["eventDateTime", "eventEndDateTime", "eventLocationName", "eventLocationAddress"].every(
       (key) => typeof (event as Record<string, unknown>)[key] === "string",
     )
@@ -142,6 +146,7 @@ export async function getActiveCheckinEvent(
     status: "available",
     event: {
       title: data.data.name,
+      description: data.data.description?.trim() || undefined,
       date: start.date,
       month: start.month,
       day: start.day,

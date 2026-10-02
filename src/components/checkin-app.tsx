@@ -13,8 +13,7 @@ import { APP_ROUTES } from "@/lib/routes";
 
 type CheckinStatus = "form" | "completed" | "already-checked-in";
 
-const DESCRIPTION_BY_STATUS: Record<CheckinStatus, string> = {
-  form: "구성원 확인을 위해 다음의 항목들을 작성 후 제출해주세요.",
+const DESCRIPTION_BY_STATUS: Record<Exclude<CheckinStatus, "form">, string> = {
   completed: "체크인이 완료되었습니다.",
   "already-checked-in": "이미 체크인 처리되었습니다.",
 };
@@ -34,7 +33,9 @@ export default function CheckinApp() {
 
   const event = result.status === "available" ? result.event : null;
   const description = event
-    ? DESCRIPTION_BY_STATUS[checkinStatus]
+    ? checkinStatus === "form"
+      ? event.description
+      : DESCRIPTION_BY_STATUS[checkinStatus]
     : "체크인 가능 시간이 아닙니다.";
 
   const refresh = () => {
@@ -104,9 +105,11 @@ export default function CheckinApp() {
                 </div>
               </>
             )}
-            <p className="event-description" style={textStyles.body.md.normal}>
-              {description}
-            </p>
+            {description && (
+              <p className="event-description" style={textStyles.body.md.normal}>
+                {description}
+              </p>
+            )}
           </header>
           {event && checkinStatus === "form" && (
             <CheckinForm

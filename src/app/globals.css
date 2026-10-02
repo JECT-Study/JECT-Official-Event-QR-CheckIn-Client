@@ -108,7 +108,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 24px;
   color: var(--color-semantic-object-normal);
 }
 .event-detail {
@@ -159,6 +158,9 @@ body {
 }
 .event-detail__secondary {
   color: var(--color-semantic-object-neutral);
+}
+.event-details + .event-description {
+  margin-top: 24px;
 }
 .event-description {
   color: var(--color-semantic-object-neutral);
