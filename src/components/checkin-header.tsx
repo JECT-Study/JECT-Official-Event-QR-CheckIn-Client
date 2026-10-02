@@ -19,9 +19,9 @@ export function CheckinHeader({ onHomeClick }: CheckinHeaderProps) {
         >
           <Image
             src="/ject_symbol.svg"
-            width={14}
-            height={14}
-            alt=""
+            width={20}
+            height={20}
+            alt="ject"
             priority
           />
           <span
