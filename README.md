@@ -55,6 +55,28 @@ NEXT_PUBLIC_CHECKIN_API_BASE_URL=https://checkin-api.ject.kr
 - `CHECKIN-003`~`CHECKIN-005`: 현장 문의 다이얼로그
 - 그 밖의 제출 오류: `/error/checkin-failed`
 
+## 활성 행사 응답 계약
+
+행사 정보 UI는 `GET /events/active`의 다음 응답을 사용합니다.
+기존 `eventDateTime`은 시작 시간으로 유지하고, 종료 시간과 장소명·주소를 추가합니다.
+날짜와 시간은 API가 제공하는 행사 현지 시각을 그대로 표시합니다.
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "name": "JECT 행사",
+    "eventDateTime": "2026-10-10T14:00:00",
+    "eventEndDateTime": "2026-10-10T18:00:00",
+    "eventLocationName": "ICT CoC",
+    "eventLocationAddress": "서울 마포구 마포대로 122 6층 ICT콤플렉스"
+  },
+  "timestamp": "2026-10-10T13:00:00"
+}
+```
+
+세 신규 필드는 필수입니다. 구버전 응답이나 유효하지 않은 행사 일정은 기존 조회 오류 흐름으로 처리됩니다.
+
 ## 구조
 
 - `src/lib`: API 계약, 응답 분류, 검증과 경로 상수
@@ -63,3 +85,17 @@ NEXT_PUBLIC_CHECKIN_API_BASE_URL=https://checkin-api.ject.kr
 - `src/app`: 정적 라우트, 전역 스타일과 메타데이터
 
 JDS 스타일은 `@jects/jds/styles`, 타이포그래피는 `@jects/jds/tokens`의 `textStyles`를 사용합니다.
+
+## 행사 정보 화면 테스트
+
+서버의 신규 응답 적용 전에는 `.env.development.local`에 다음 값을 설정하고 `pnpm dev`를 실행합니다.
+이미 실행 중이라면 개발 서버를 재시작합니다.
+
+```dotenv
+NEXT_PUBLIC_MOCK_CHECKIN_EVENT=true
+```
+
+행사 조회 요청 대신 2026년 10월 10일 14:00~18:00, ICT CoC의 테스트 응답을 사용합니다.
+화면 제목에 `(테스트)`가 표시되며, 실제 응답과 동일한 검증·변환 과정을 거칩니다.
+이 설정은 개발 환경에서만 적용됩니다. 체크인 제출은 실제 API를 사용합니다.
+서버 연동으로 돌아가려면 값을 `false`로 변경하고 개발 서버를 재시작합니다.

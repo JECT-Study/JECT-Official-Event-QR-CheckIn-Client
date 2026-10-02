@@ -8,7 +8,13 @@ import {
 
 export type CheckinEvent = {
   title: string;
-  dateTime: string;
+  date: string;
+  month: number;
+  day: number;
+  dateLabel: string;
+  timeLabel: string;
+  locationName: string;
+  locationAddress: string;
 };
 
 type ActiveEventResponse = {
@@ -16,6 +22,9 @@ type ActiveEventResponse = {
   data: {
     name: string;
     eventDateTime: string;
+    eventEndDateTime: string;
+    eventLocationName: string;
+    eventLocationAddress: string;
   };
   timestamp: string;
 };
@@ -39,11 +48,13 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
     !!event &&
     typeof event === "object" &&
     typeof (event as Record<string, unknown>).name === "string" &&
-    typeof (event as Record<string, unknown>).eventDateTime === "string"
+    ["eventDateTime", "eventEndDateTime", "eventLocationName", "eventLocationAddress"].every(
+      (key) => typeof (event as Record<string, unknown>)[key] === "string",
+    )
   );
 }
 
-function formatEventDateTime(value: string): string {
+function parseEventDateTime(value: string) {
   const match = EVENT_DATE_TIME_PATTERN.exec(value);
   if (!match)
     throw new Error("Event date time does not match the expected format");
@@ -69,38 +80,77 @@ function formatEventDateTime(value: string): string {
 
   const weekday = WEEKDAYS[date.getUTCDay()];
 
-  return `${yearNumber}년 ${monthNumber}월 ${dayNumber}일(${weekday}) ${hour}:${minute}`;
+  return {
+    date: `${year}-${month}-${day}`,
+    month: monthNumber,
+    day: dayNumber,
+    dateLabel: `${yearNumber}년 ${monthNumber}월 ${dayNumber}일(${weekday})`,
+    time: `${hour}:${minute}`,
+    timestamp: date.getTime(),
+  };
 }
 
 export async function getActiveCheckinEvent(
   signal?: AbortSignal,
 ): Promise<ActiveCheckinResult> {
-  const eventUrl = createApiUrl(API_PATHS.activeEvent);
-
-  const response = await fetch(eventUrl, { cache: "no-store", signal });
-  const data = await readJson(response);
-
+  let data: unknown;
   if (
-    response.status === 409 &&
-    isApiErrorResponse(data) &&
-    data.status === API_ERROR_CODES.eventNotStarted
+    process.env.NODE_ENV === "development" &&
+    process.env.NEXT_PUBLIC_MOCK_CHECKIN_EVENT === "true"
   ) {
-    return { status: "not-started" };
-  }
+    data = {
+      status: "SUCCESS",
+      data: {
+        name: "JECT 행사 (테스트)",
+        eventDateTime: "2026-10-10T14:00:00",
+        eventEndDateTime: "2026-10-10T18:00:00",
+        eventLocationName: "ICT CoC",
+        eventLocationAddress: "서울 마포구 마포대로 122 6층 ICT콤플렉스",
+      },
+      timestamp: "2026-10-10T13:00:00",
+    } satisfies ActiveEventResponse;
+  } else {
+    const eventUrl = createApiUrl(API_PATHS.activeEvent);
 
-  if (!response.ok) {
-    throw new Error(`Event lookup failed with status ${response.status}`);
+    const response = await fetch(eventUrl, { cache: "no-store", signal });
+    data = await readJson(response);
+
+    if (
+      response.status === 409 &&
+      isApiErrorResponse(data) &&
+      data.status === API_ERROR_CODES.eventNotStarted
+    ) {
+      return { status: "not-started" };
+    }
+
+    if (!response.ok) {
+      throw new Error(`Event lookup failed with status ${response.status}`);
+    }
   }
 
   if (!isActiveEventResponse(data)) {
     throw new Error("Event response does not match the expected schema");
   }
 
+  const start = parseEventDateTime(data.data.eventDateTime);
+  const end = parseEventDateTime(data.data.eventEndDateTime);
+  if (end.timestamp < start.timestamp) {
+    throw new Error("Event end must not precede its start");
+  }
+
   return {
     status: "available",
     event: {
       title: data.data.name,
-      dateTime: formatEventDateTime(data.data.eventDateTime),
+      date: start.date,
+      month: start.month,
+      day: start.day,
+      dateLabel: start.dateLabel,
+      timeLabel: start.date === end.date
+        ? `${start.time}~${end.time}`
+        : `${start.time}~${end.dateLabel} ${end.time}`,
+      locationName: data.data.eventLocationName,
+      locationAddress: data.data.eventLocationAddress,
     },
   };
 }

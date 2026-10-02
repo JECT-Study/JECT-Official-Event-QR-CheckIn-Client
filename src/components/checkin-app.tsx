@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
 import { CheckinForm } from "./checkin-form";
-import { CalendarIcon } from "./icons/calendar-icon";
+import { PinIcon } from "./icons/pin-icon";
 import { LoadingScreen } from "./loading-screen";
 import { useActiveCheckinEvent } from "@/hooks/use-active-checkin-event";
 import { APP_ROUTES } from "@/lib/routes";
@@ -59,10 +59,27 @@ export default function CheckinApp() {
                 >
                   {event.title}
                 </h1>
-                <p className="event-date" style={textStyles.label.md.normal}>
-                  <CalendarIcon />
-                  <time>{event.dateTime}</time>
-                </p>
+                <div className="event-details" style={textStyles.label.md.normal}>
+                  <div className="event-detail">
+                    <div className="event-detail__icon event-calendar" aria-hidden="true">
+                      <span className="event-calendar__month">{event.month}</span>
+                      <span className="event-calendar__day">{event.day}</span>
+                    </div>
+                    <div className="event-detail__text">
+                      <p><time dateTime={event.date}>{event.dateLabel}</time></p>
+                      <p className="event-detail__secondary">{event.timeLabel}</p>
+                    </div>
+                  </div>
+                  <div className="event-detail">
+                    <div className="event-detail__icon" aria-hidden="true">
+                      <PinIcon />
+                    </div>
+                    <div className="event-detail__text">
+                      <p>{event.locationName}</p>
+                      <p className="event-detail__secondary">{event.locationAddress}</p>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
             <p className="event-description" style={textStyles.body.md.normal}>

@@ -104,12 +104,54 @@ body {
   color: var(--color-semantic-object-boldest);
   word-break: keep-all;
 }
-.event-date {
+.event-details {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 16px;
   margin-bottom: 24px;
   color: var(--color-semantic-object-normal);
+}
+.event-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.event-detail__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--color-semantic-stroke-alpha-subtler);
+  border-radius: 7px;
+}
+.event-calendar {
+  flex-direction: column;
+  font-size: 13px;
+  line-height: 1;
+}
+.event-calendar__month,
+.event-calendar__day {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+.event-calendar__month {
+  background: var(--color-semantic-surface-deeper);
+}
+.event-detail__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.event-detail__text p {
+  margin: 0;
+}
+.event-detail__secondary {
+  color: var(--color-semantic-object-neutral);
 }
 .event-description {
   color: var(--color-semantic-object-neutral);
