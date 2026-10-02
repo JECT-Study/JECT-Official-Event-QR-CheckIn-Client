@@ -97,10 +97,10 @@ body {
   padding: 32px 28px 112px;
 }
 .event-summary {
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 .event-title {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   color: var(--color-semantic-object-boldest);
   word-break: keep-all;
 }
@@ -121,27 +121,34 @@ body {
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   overflow: hidden;
-  border: 1px solid var(--color-semantic-stroke-alpha-subtler);
-  border-radius: 7px;
+  border: 1px solid rgba(207, 207, 208, 1);
+  border-radius: 6px;
+  color: var(--color-semantic-object-normal);
 }
 .event-calendar {
   flex-direction: column;
   font-size: 13px;
   line-height: 1;
 }
-.event-calendar__month,
-.event-calendar__day {
+
+.event-calendar__month {
   display: flex;
   width: 100%;
-  flex: 1;
+  height: 18px;
+  border-bottom: 1px solid rgba(207, 207, 208, 1);
   align-items: center;
   justify-content: center;
+  background: rgba(17, 17, 24, 0.13);
 }
-.event-calendar__month {
-  background: var(--color-semantic-surface-deeper);
+.event-calendar__day {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 .event-detail__text {
   min-width: 0;

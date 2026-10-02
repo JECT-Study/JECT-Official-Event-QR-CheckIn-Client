@@ -59,15 +59,35 @@ export default function CheckinApp() {
                 >
                   {event.title}
                 </h1>
-                <div className="event-details" style={textStyles.label.md.normal}>
+                <div
+                  className="event-details"
+                  style={textStyles.label.md.normal}
+                >
                   <div className="event-detail">
-                    <div className="event-detail__icon event-calendar" aria-hidden="true">
-                      <span className="event-calendar__month">{event.month}</span>
-                      <span className="event-calendar__day">{event.day}</span>
+                    <div
+                      className="event-detail__icon event-calendar"
+                      aria-hidden="true"
+                    >
+                      <span
+                        className="event-calendar__month"
+                        style={textStyles.label.xs.normal}
+                      >
+                        {event.month}
+                      </span>
+                      <span
+                        className="event-calendar__day"
+                        style={textStyles.label.sm.normal}
+                      >
+                        {event.day}
+                      </span>
                     </div>
                     <div className="event-detail__text">
-                      <p><time dateTime={event.date}>{event.dateLabel}</time></p>
-                      <p className="event-detail__secondary">{event.timeLabel}</p>
+                      <p>
+                        <time dateTime={event.date}>{event.dateLabel}</time>
+                      </p>
+                      <p className="event-detail__secondary">
+                        {event.timeLabel}
+                      </p>
                     </div>
                   </div>
                   <div className="event-detail">
@@ -76,7 +96,9 @@ export default function CheckinApp() {
                     </div>
                     <div className="event-detail__text">
                       <p>{event.locationName}</p>
-                      <p className="event-detail__secondary">{event.locationAddress}</p>
+                      <p className="event-detail__secondary">
+                        {event.locationAddress}
+                      </p>
                     </div>
                   </div>
                 </div>
