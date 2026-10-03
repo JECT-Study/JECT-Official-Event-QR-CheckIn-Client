@@ -5,6 +5,7 @@ import { BlockButton } from "@jects/jds";
 import { textStyles } from "@jects/jds/tokens";
 import { getActiveEventTimetable, type EventTimetableRow } from "@/lib/timetable";
 import { EventTimetable } from "./event-timetable";
+import { Spinner } from "./spinner";
 
 type State =
   | { status: "loading" }
@@ -29,7 +30,7 @@ export function CompletedEventTimetable() {
   }, [requestVersion]);
 
   if (state.status === "loading") {
-    return <p role="status" style={textStyles.body.md.normal}>타임테이블을 불러오는 중입니다.</p>;
+    return <Spinner size={24} aria-label="타임테이블 불러오는 중" />;
   }
   if (state.status === "error") {
     return (
