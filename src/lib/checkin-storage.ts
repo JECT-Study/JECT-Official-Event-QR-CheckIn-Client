@@ -3,7 +3,7 @@ import type { CheckinEvent } from "./event";
 type SavedEvent = Pick<CheckinEvent, "eventKey" | "checkinExpiresAt">;
 const STORAGE_KEY = process.env.NODE_ENV === "development" &&
   process.env.NEXT_PUBLIC_MOCK_CHECKIN_EVENT === "true"
-  ? "ject:checkin:mock:v1" : "ject:checkin:v1";
+  ? "ject:checkin:preview:v1" : "ject:checkin:v1";
 
 export function clearSavedCheckin(): void {
   try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* Storage is optional. */ }

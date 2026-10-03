@@ -99,6 +99,7 @@ export default function CheckinApp() {
                       </p>
                     </div>
                   </div>
+                  {(event.locationName || event.locationAddress) && (
                   <div className="event-detail">
                     <div className="event-detail__icon" aria-hidden="true">
                       <PinIcon />
@@ -110,6 +111,7 @@ export default function CheckinApp() {
                       </p>
                     </div>
                   </div>
+                  )}
                 </div>
               </>
             )}

@@ -99,38 +99,33 @@ function parseEventDateTime(value: string) {
 export async function getActiveCheckinEvent(
   signal?: AbortSignal,
 ): Promise<ActiveCheckinResult> {
-  let data: unknown;
-  if (
-    process.env.NODE_ENV === "development" &&
-    process.env.NEXT_PUBLIC_MOCK_CHECKIN_EVENT === "true"
-  ) {
-    data = {
-      status: "SUCCESS",
-      data: {
-        name: "JECT 행사 (테스트)",
-        eventDateTime: "2026-10-10T14:00:00",
-        eventEndDateTime: "2026-10-10T18:00:00",
-        eventLocationName: "ICT CoC",
-        eventLocationAddress: "서울 마포구 마포대로 122 6층 ICT콤플렉스",
-      },
-      timestamp: "2026-10-10T13:00:00",
-    } satisfies ActiveEventResponse;
-  } else {
-    const eventUrl = createApiUrl(API_PATHS.activeEvent);
+  const isPreview = process.env.NODE_ENV === "development" &&
+    process.env.NEXT_PUBLIC_MOCK_CHECKIN_EVENT === "true";
+  const response = await fetch(createApiUrl(
+    isPreview ? API_PATHS.previewEvent : API_PATHS.activeEvent,
+  ), { cache: "no-store", signal });
+  let data = await readJson(response);
+  if (response.status === 409 && isApiErrorResponse(data) &&
+    data.status === API_ERROR_CODES.eventNotStarted) {
+    return { status: "not-started" };
+  }
+  if (!response.ok) {
+    throw new Error(`Event lookup failed with status ${response.status}`);
+  }
 
-    const response = await fetch(eventUrl, { cache: "no-store", signal });
-    data = await readJson(response);
-
-    if (
-      response.status === 409 &&
-      isApiErrorResponse(data) &&
-      data.status === API_ERROR_CODES.eventNotStarted
-    ) {
-      return { status: "not-started" };
-    }
-
-    if (!response.ok) {
-      throw new Error(`Event lookup failed with status ${response.status}`);
+  // The preview endpoint only guarantees a name and start time.
+  let previewWithoutEnd = false;
+  if (isPreview && data && typeof data === "object") {
+    const envelope = data as Record<string, unknown>;
+    if (envelope.data && typeof envelope.data === "object") {
+      const event = envelope.data as Record<string, unknown>;
+      previewWithoutEnd = event.eventEndDateTime == null;
+      data = { ...envelope, data: {
+        ...event,
+        eventEndDateTime: event.eventEndDateTime ?? event.eventDateTime,
+        eventLocationName: event.eventLocationName ?? "",
+        eventLocationAddress: event.eventLocationAddress ?? "",
+      } };
     }
   }
 
@@ -156,7 +151,7 @@ export async function getActiveCheckinEvent(
       month: start.month,
       day: start.day,
       dateLabel: start.dateLabel,
-      timeLabel: start.date === end.date
+      timeLabel: previewWithoutEnd ? start.time : start.date === end.date
         ? `${start.time}~${end.time}`
         : `${start.time}~${end.dateLabel} ${end.time}`,
       locationName: data.data.eventLocationName,

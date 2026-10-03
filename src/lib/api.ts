@@ -5,6 +5,8 @@ const ALLOWED_PRODUCTION_API_ORIGINS = new Set([
 ]);
 
 export const API_PATHS = {
+  previewEvent: "/dev/events/active",
+  previewTimetable: "/dev/events/active/timetable",
   activeEvent: "/events/active",
   activeEventTimetable: "/events/active/timetable",
   activeEventCheckin: "/events/active/check-in",

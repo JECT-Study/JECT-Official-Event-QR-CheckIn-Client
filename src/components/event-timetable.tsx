@@ -28,7 +28,7 @@ export function EventTimetable({ rows }: { rows: EventTimetableRow[] }) {
                 <Table.RowItem variant="label">
                   {row.startTime}
                   ~<wbr />
-                  {row.endTime}
+                  {row.endTime ?? "미정"}
                 </Table.RowItem>
                 <Table.RowItem variant="label" hasDivider={false}>
                   {row.schedule}
