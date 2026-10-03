@@ -5,7 +5,7 @@ import { textStyles } from "@jects/jds/tokens";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "./app-shell";
-import { EventTimetable } from "./event-timetable";
+import { CompletedEventTimetable } from "./completed-event-timetable";
 import { CheckinForm } from "./checkin-form";
 import { PinIcon } from "./icons/pin-icon";
 import { LoadingScreen } from "./loading-screen";
@@ -119,7 +119,7 @@ export default function CheckinApp() {
             />
           )}
           {event && checkinStatus !== "form" && (
-            <EventTimetable rows={event.timetable} />
+            <CompletedEventTimetable />
           )}
           {!event && (
             <div className="checkin-form">

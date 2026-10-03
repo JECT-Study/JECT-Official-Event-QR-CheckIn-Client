@@ -6,10 +6,12 @@ const ALLOWED_PRODUCTION_API_ORIGINS = new Set([
 
 export const API_PATHS = {
   activeEvent: "/events/active",
+  activeEventTimetable: "/events/active/timetable",
   activeEventCheckin: "/events/active/check-in",
 } as const;
 
 export const API_ERROR_CODES = {
+  activeEventNotFound: "EVENT-003",
   eventNotStarted: "EVENT-004",
   checkinClosed: "CHECKIN-001",
   alreadyCheckedIn: "CHECKIN-002",

@@ -1,6 +1,6 @@
 import { Table } from "@jects/jds";
 import { textStyles } from "@jects/jds/tokens";
-import type { EventTimetableRow } from "@/lib/event";
+import type { EventTimetableRow } from "@/lib/timetable";
 
 export function EventTimetable({ rows }: { rows: EventTimetableRow[] }) {
   if (rows.length === 0) return null;
@@ -23,15 +23,15 @@ export function EventTimetable({ rows }: { rows: EventTimetableRow[] }) {
             <Table.HeaderItem hasDivider={false}>내용</Table.HeaderItem>
           </Table.Header>
           <Table.Body>
-            {rows.map((row) => (
-              <Table.Row key={row.id}>
+            {rows.map((row, index) => (
+              <Table.Row key={index}>
                 <Table.RowItem variant="label">
-                  <time dateTime={row.startTime}>{row.startTime}</time>
+                  {row.startTime}
                   ~<wbr />
-                  <time dateTime={row.endTime}>{row.endTime}</time>
+                  {row.endTime}
                 </Table.RowItem>
                 <Table.RowItem variant="label" hasDivider={false}>
-                  {row.content}
+                  {row.schedule}
                 </Table.RowItem>
               </Table.Row>
             ))}
