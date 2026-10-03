@@ -10,6 +10,7 @@ import { CheckinForm } from "./checkin-form";
 import { PinIcon } from "./icons/pin-icon";
 import { LoadingScreen } from "./loading-screen";
 import { useActiveCheckinEvent } from "@/hooks/use-active-checkin-event";
+import { saveCheckin } from "@/lib/checkin-storage";
 import { APP_ROUTES } from "@/lib/routes";
 
 type CheckinStatus = "form" | "completed" | "already-checked-in";
@@ -21,8 +22,8 @@ const DESCRIPTION_BY_STATUS: Record<Exclude<CheckinStatus, "form">, string> = {
 
 export default function CheckinApp() {
   const router = useRouter();
-  const { result, error, isLoading, refetch } = useActiveCheckinEvent();
-  const [checkinStatus, setCheckinStatus] = useState<CheckinStatus>("form");
+  const { result, error, isLoading, refetch, restoredCheckin } = useActiveCheckinEvent();
+  const [sessionStatus, setCheckinStatus] = useState<CheckinStatus>("form");
 
   useEffect(() => {
     if (error) router.replace(APP_ROUTES.invalidAccess);
@@ -33,6 +34,12 @@ export default function CheckinApp() {
   }
 
   const event = result.status === "available" ? result.event : null;
+  const checkinStatus = sessionStatus === "form" && restoredCheckin
+    ? "completed" : sessionStatus;
+  const complete = (status: "completed" | "already-checked-in") => {
+    if (event) saveCheckin(event);
+    setCheckinStatus(status);
+  };
   const description = event
     ? checkinStatus === "form"
       ? event.description
@@ -114,8 +121,8 @@ export default function CheckinApp() {
           </header>
           {event && checkinStatus === "form" && (
             <CheckinForm
-              onComplete={() => setCheckinStatus("completed")}
-              onAlreadyCheckedIn={() => setCheckinStatus("already-checked-in")}
+              onComplete={() => complete("completed")}
+              onAlreadyCheckedIn={() => complete("already-checked-in")}
             />
           )}
           {event && checkinStatus !== "form" && (

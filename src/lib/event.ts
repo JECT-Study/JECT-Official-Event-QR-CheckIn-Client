@@ -8,6 +8,8 @@ import {
 
 export type CheckinEvent = {
   title: string;
+  eventKey: string;
+  checkinExpiresAt: number;
   description?: string;
   date: string;
   month: number;
@@ -146,6 +148,9 @@ export async function getActiveCheckinEvent(
     status: "available",
     event: {
       title: data.data.name,
+      eventKey: JSON.stringify([data.data.name, data.data.eventDateTime]),
+      // API dates represent Korean local time; expire at the following midnight.
+      checkinExpiresAt: Date.parse(`${end.date}T00:00:00+09:00`) + 86_400_000,
       description: data.data.description?.trim() || undefined,
       date: start.date,
       month: start.month,
