@@ -26,9 +26,9 @@ type ActiveEventResponse = {
     name: string;
     description?: string | null;
     eventDateTime: string;
-    eventEndDateTime: string;
-    eventLocationName: string;
-    eventLocationAddress: string;
+    eventEndDateTime?: string | null;
+    eventLocationName?: string | null;
+    eventLocationAddress?: string | null;
   };
   timestamp: string;
 };
@@ -54,8 +54,10 @@ function isActiveEventResponse(value: unknown): value is ActiveEventResponse {
     typeof (event as Record<string, unknown>).name === "string" &&
     ((event as Record<string, unknown>).description == null ||
       typeof (event as Record<string, unknown>).description === "string") &&
-    ["eventDateTime", "eventEndDateTime", "eventLocationName", "eventLocationAddress"].every(
-      (key) => typeof (event as Record<string, unknown>)[key] === "string",
+    typeof (event as Record<string, unknown>).eventDateTime === "string" &&
+    ["eventEndDateTime", "eventLocationName", "eventLocationAddress"].every(
+      (key) => (event as Record<string, unknown>)[key] == null ||
+        typeof (event as Record<string, unknown>)[key] === "string",
     )
   );
 }
@@ -104,7 +106,7 @@ export async function getActiveCheckinEvent(
   const response = await fetch(createApiUrl(
     isPreview ? API_PATHS.previewEvent : API_PATHS.activeEvent,
   ), { cache: "no-store", signal });
-  let data = await readJson(response);
+  const data = await readJson(response);
   if (response.status === 409 && isApiErrorResponse(data) &&
     data.status === API_ERROR_CODES.eventNotStarted) {
     return { status: "not-started" };
@@ -113,28 +115,13 @@ export async function getActiveCheckinEvent(
     throw new Error(`Event lookup failed with status ${response.status}`);
   }
 
-  // The preview endpoint only guarantees a name and start time.
-  let previewWithoutEnd = false;
-  if (isPreview && data && typeof data === "object") {
-    const envelope = data as Record<string, unknown>;
-    if (envelope.data && typeof envelope.data === "object") {
-      const event = envelope.data as Record<string, unknown>;
-      previewWithoutEnd = event.eventEndDateTime == null;
-      data = { ...envelope, data: {
-        ...event,
-        eventEndDateTime: event.eventEndDateTime ?? event.eventDateTime,
-        eventLocationName: event.eventLocationName ?? "",
-        eventLocationAddress: event.eventLocationAddress ?? "",
-      } };
-    }
-  }
-
   if (!isActiveEventResponse(data)) {
     throw new Error("Event response does not match the expected schema");
   }
 
   const start = parseEventDateTime(data.data.eventDateTime);
-  const end = parseEventDateTime(data.data.eventEndDateTime);
+  const endDateTime = data.data.eventEndDateTime?.trim();
+  const end = endDateTime ? parseEventDateTime(endDateTime) : start;
   if (end.timestamp < start.timestamp) {
     throw new Error("Event end must not precede its start");
   }
@@ -151,11 +138,11 @@ export async function getActiveCheckinEvent(
       month: start.month,
       day: start.day,
       dateLabel: start.dateLabel,
-      timeLabel: previewWithoutEnd ? start.time : start.date === end.date
+      timeLabel: !endDateTime ? start.time : start.date === end.date
         ? `${start.time}~${end.time}`
         : `${start.time}~${end.dateLabel} ${end.time}`,
-      locationName: data.data.eventLocationName,
-      locationAddress: data.data.eventLocationAddress,
+      locationName: data.data.eventLocationName?.trim() ?? "",
+      locationAddress: data.data.eventLocationAddress?.trim() ?? "",
     },
   };
 }
